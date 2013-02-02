@@ -1,0 +1,28 @@
+This is an event-management system built for managing a specific need by a Summer Camp. This system is designed so that the browsers do not need to have constant access to the internet, so this system works will for mobile devices or inconsistent internet connections.
+
+To get into SBT:
+java -XX:MaxPermSize=256M -Xmx512m -jar sbt-launch.jar
+
+App engine:
+appenginesdk\bin\dev_appserver.cmd --disable_update_check --address=0.0.0.0 --jvm_flag=-Ddatastore.default_high_rep_job_policy_unapplied_job_pct=20 --jvm_flag=-Ddatastore.backing_store=local_db.bin --port=8888 eventsynergy\target\webapp
+
+Update:
+appenginesdk\bin\appcfg.cmd update eventsynergy\target\webapp
+
+To do:
+- Document code
+- Additional cleanup
+- Research to see if blobstore actually works in free mode now
+- JSON validation checking needed
+- Unit Tests (Both on javascript side and server)
+
+ - Reporting
+ 	- Printing support in interfaces
+ - Emailer
+ - Request for reimbersement tracking
+ - Points interface needs to remember state through mod/refresh/add/remove
+ - Need to cleanup html injection problems with generated HTML
+ - As above, need to make html injection code more efficient too
+ 
+ - Issue where the registration page requires an up-to-date jsondb, but doesn't look to pending transactions?
+   - This actually takes a very long time when the db is large. The parsing is very slow. This should be... handled better. Perhaps a cache or saving a parsed version?

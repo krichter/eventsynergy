@@ -1,0 +1,603 @@
+#tabs {
+	position: relative;
+	padding-left: 10.5em;
+}
+
+#tabs .ui-tabs-nav {
+	position: absolute;
+	left: 0.25em;
+	top: 0.25em;
+	bottom: 0.25em;
+	width: 10em;
+	padding: 0.2em 0 0.2em 0.2em;
+}
+#tabs .ui-tabs-panel { height: 90%; overflow: auto; } 
+
+#tabs .ui-tabs-nav li {
+	right: 1px;
+	width: 100%;
+	border-right: none;
+	border-bottom-width: 1px !important;
+	border-radius: 4px 0px 0px 4px;
+	-moz-border-radius: 4px 0px 0px 4px;
+	-webkit-border-radius: 4px 0px 0px 4px;
+	overflow: hidden;
+}
+
+#tabs .ui-tabs-nav li.ui-tabs-selected {
+	border-right: 1px solid transparent;
+}
+#tabs .ui-tabs-nav li a {
+	float: right;
+	width: 100%;
+	text-align: right;
+}
+#tabs > div {
+	/*height: 35em;*/
+	height: 100%;
+}
+
+    body {
+        margin:0;
+        padding:0;
+        border:0;			/* This removes the border around the viewport in old versions of IE */
+        width:100%;
+        background:#fff;
+        min-width:600px;    /* Minimum width of layout - remove line if not required */
+							/* The min-width property does not work in old versions of Internet Explorer */
+		font-size:90%;
+    }
+	/* Header styles */
+    #header {
+        clear:both;
+        float:left;
+        width:100%;
+    }
+	#header {
+		border-bottom:1px solid #000;
+	}
+
+	/* 'widths' sub menu */
+	#layoutdims {
+		clear:both;
+		background:#eee;
+		border-top:4px solid #000;
+		margin:0;
+		padding:6px 15px !important;
+		text-align:right;
+	}
+	/* column container */
+	.colmask {
+		position:relative;		/* This fixes the IE7 overflow hidden bug and stops the layout jumping out of place */
+	    clear:both;
+	    float:left;
+        width:100%;			/* width of whole page */
+		overflow:hidden;	/* This chops off any overhanging divs */
+	}
+	/* 2 column left menu settings */
+	.leftmenu {
+	    background:#FFD8B7;
+	}
+    .leftmenu .colright {
+        float:left;
+        width:200%;
+		position:relative;
+		left:200px;
+        background:#fff;
+    }
+    .leftmenu .col1wrap {
+	    float:right;
+	    width:50%;
+	    position:relative;
+	    right:200px;
+	    padding-bottom:1em;
+	}
+	.leftmenu .col1 {
+        margin:0 15px 0 215px;
+	    position:relative;
+	    right:100%;
+	    overflow:hidden;
+	}
+    .leftmenu .col2 {
+        float:left;
+        width:170px;
+        position:relative;
+        right:185px;
+    }
+    
+.interfacebutton {
+	width: 100%;
+	background-color: red;
+	cursor: pointer;
+	cursor: hand;
+}
+
+#simplemodal-container a.modalCloseImg {
+	background:url(/assets/x.png) no-repeat; /* adjust url as required */
+	width:25px;
+	height:29px;
+	display:inline;
+	z-index:3200;
+	position:absolute;
+	top:-15px;
+	right:-18px;
+	cursor:pointer;
+}
+.simplemodal-data {
+	height:100%;
+	overflow:auto;
+}
+
+/* basic */
+#basic-modal-content {display:none;}
+#simplemodal-overlay {background-color:#000; cursor:wait;}
+#simplemodal-container {height:320px; width:600px; color:#bbb; background-color:#333; border:4px solid #444; padding:12px;}
+#simplemodal-test {height:520px; width:1000px; color:#bbb; background-color:#333; border:4px solid #444; padding:12px;}
+#simplemodal-container code {background:#141414; border-left:3px solid #65B43D; color:#bbb; display:block; margin-bottom:12px; padding:4px 6px 6px;}
+#simplemodal-container a {color:#ddd;}
+#simplemodal-container #basic-modal-content {padding:8px;}
+
+#topheader {
+	background-color: #0088aa;
+	width: 300px;
+	float: left;
+}
+
+#topheader_button_home {
+	float: right;
+}
+
+#contentcontainer {
+	float: left;
+	background-color: red;
+	
+}
+
+td {
+	font-family: Verdana;
+	font-size: 9pt;
+}
+
+th {
+	font-family: Verdana;
+	font-size: 10pt;
+	font-weight: bold;
+}
+
+body {
+	margin: 0px;
+	background-color: #88bbff;
+	font-family: Verdana;
+	font-size: 9pt;
+}
+
+.topheader_button {
+	background-color: white;
+	margin: 0px;
+}
+
+.cbutton {
+	background-color: white;
+	margin: 0px;
+}
+
+.garow {
+	background-color: #0088aa;
+	font-weight: bold;
+	font-size: 10pt;
+	padding-left: 5px;
+	color: white; 
+}
+
+#interface_people,#interface_groups,#interface_affiliation,#interface_points {
+	text-align: center;
+	width: 100%;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+.garow_buttons {
+	background-color: #0088aa;
+	text-align: right;
+}
+
+.garow_button {
+	background-color: white;
+	margin: 0px;
+}
+
+.grow {
+	background-color: white;	
+}
+
+.grow_button {
+	background-color: white;
+	margin: 0px;
+}
+
+.grow_buttons {
+	background-color: white;
+}
+
+#grouptable {
+	width: 100%;
+	cell-spacing: 0px;
+	border-width: 0px;
+	border-spacing: 0px;
+	border: 0px none;
+}
+
+.peopletable {
+	width: 100%;
+}
+
+#public_affiliationgrouptable,#public_affiliationgrouptablecontainer {	
+	text-align:center;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+.peoplerow,.affiliationrow {
+	background-color: white;
+	padding-left: 5px;
+}
+
+.affiliationbuttoncell {
+	width: 150px;
+	white-space: nowrap;
+	text-align: center;
+}
+
+.sortheader {
+	cursor: pointer;
+	cursor: hand;
+}
+
+.buttoncell {
+	width: 1px;
+	text-align: right;
+}
+
+.grouptable,#pointstable {
+	text-align:center;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+.grouptablecell {
+	text-align: center;
+}
+
+.grow_buttons {
+	text-align: right;
+}
+
+table.regtable {
+	width: 100%;
+}
+
+.regrow {
+	background-color: white;	
+}
+
+.pointsheaderrow {
+	background-color: white;
+}
+
+.alignleft {
+	text-align: left;
+}
+
+.alignright {
+	text-align: right;
+}
+
+.pointsdatatable {
+	width: 100%;
+}
+
+.pointsdatatable_buttons {
+	width: 100px;
+	text-align: left;
+	background-color: white;
+}
+
+.pointsdatatable_reason {
+	background-color: white;
+}
+
+.pointsdatatable_value {
+	text-align: center;
+	width: 100px;
+	background-color: white;
+}
+
+.centerit {
+	text-align: center;
+}
+
+table.public_customfields {
+	width: 100%;
+}
+
+th.public_customfields,td.public_customfields {
+	background-color: white;
+}
+
+table.modal_groupview_datalist {
+	width: 100%;
+}
+
+th.modal_groupview_datalist,td.modal_groupview_datalist {
+	background-color: white;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+td.modal_groupview_datalist_view {
+	width: 75px;
+	text-align: center;
+}
+
+td.modal_groupview_datalist_type {
+	width: 150px;
+	text-align: center;
+}
+
+td.modal_groupview_datalist_reassign {
+	width: 200px;
+	text-align: center;
+	white-space: nowrap;
+}
+
+td.modal_groupview_datalist_check {
+	width: 1px;
+	text-align: center;
+}
+
+table.modal_affiliationgroupviewer_datalist {
+	width: 100%;	
+}
+
+th.modal_affiliationgroupviewer_datalist,td.modal_affiliationgroupviewer_datalist {
+	white-space: nowrap;
+	background-color: white;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.modal_person_customtable_value {
+	color: #bbb;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.modal_person_customtable_fieldname {
+	color: #bbb;
+	white-space: nowrap;
+	padding-left: 5px;
+	padding-right: 5px;
+	text-align: right;
+}
+
+.modal_person_grouptable_label {
+	color: #bbb;
+	white-space: nowrap;
+	padding-left: 5px;
+	padding-right: 5px;
+	text-align: right;
+}
+
+.modal_person_grouptable_group {
+	color: #bbb;
+	white-space: nowrap;
+	padding-left: 5px;
+	padding-right: 5px;	
+}
+
+.modal_person_financetable_modifier {
+	color: #bbb;
+	white-space: nowrap;
+	padding-left: 5px;
+	padding-right: 5px;
+	text-align: right;	
+}
+.modal_person_financetable_type {
+	color: #bbb;
+	white-space: nowrap;
+	padding-left: 5px;
+	padding-right: 5px;
+	text-align: center;	
+}
+.modal_person_financetable_label {
+	color: #bbb;
+	white-space: nowrap;
+	padding-left: 5px;
+	padding-right: 5px;	
+}
+.modal_person_financetable_total {
+	color: #bbb;
+	white-space: nowrap;
+	padding-left: 5px;
+	padding-right: 5px;	
+	text-align: right;
+}
+
+.noimage {
+	background-color:black;
+	width:150px;
+	height:150px;	
+}
+ 
+.modal_fieldlabelcell {
+	color: #bbb;
+	white-space: nowrap;
+	padding-left: 5px;
+	padding-right: 5px;	
+	text-align: right;
+}
+
+.modal_fieldgroupcell {
+	color: #bbb;
+	white-space: nowrap;
+	padding-left: 5px;
+	padding-right: 5px;	
+	text-align: left;
+	vertical-align:top;
+}
+
+.modal_fieldtable,table.modal_shopinput_table,.modal_createreport_table {
+	width: 100%;	
+}
+
+th.modal_shopinput_table {
+	padding-left: 5px;
+	padding-right: 5px;
+	color: #bbb;
+}
+
+/* 	color: #bbb;		*/
+.currencycell {
+	padding-left: 5px;
+	padding-right: 5px;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.modal_generalcell,.modal_fieldinputcell {
+	color: #bbb;
+	padding-left: 5px;
+	padding-right: 5px;	
+}
+
+.allocationrow {
+	padding-left: 5px;
+	padding-right: 5px;
+	color: #bbb;	
+}
+
+.allocationamount {
+	padding-left: 5px;
+	padding-right: 5px;
+	text-align: right;
+	color: #bbb;	
+}
+
+td.modal_fieldinputcell_checkbox {
+	width: 5px;
+}
+
+#interface_finance_moneyin,#interface_finance_spenders,#interface_finance_people,#interface_finance_budget {
+	text-align: center;
+	width: 100%;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+#finance_paymenttable,#finance_spendertable,table.finance_peopletable,table.finance_budgettable {
+	margin-left:auto;
+	margin-right:auto;
+}
+
+th.finance_peopletable {
+	white-space: nowrap;
+	background-color: #08A;
+	color: white;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+td.finance_peopletable {
+	white-space: nowrap;
+	padding-left: 5px;
+	padding-right: 5px;
+	background-color: white;
+}
+
+.finance_paymenttable {
+	white-space: nowrap;
+	background-color: #08A;
+	color: white;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.totalremaining,.vouch {
+	color: #bbb;
+}
+
+.finance_paymenttable_amount,.finance_spendertable {
+	white-space: nowrap;
+	background-color: #08A;
+	color: white;
+	padding-left: 5px;
+	padding-right: 5px;
+	width: 80px;
+	vertical-align:top;
+}
+
+table.finance_paymentdetails {
+	width: 100%;
+	margin-bottom: 15px;
+}
+
+.finance_paymentrow {
+	background-color: white;
+	white-space: nowrap;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.finance_paymentrow_amount {
+	background-color: white;
+	width: 80px;
+	white-space: nowrap;	
+}
+
+table.finance_spenderdetail {
+	width: 100%;
+	
+}
+
+td.finance_spenderdetail {
+	background-color: white;
+	white-space: nowrap;
+}
+
+.expectedincomerow,.barow {
+	background-color: white;
+	white-space: nowrap;
+	vertical-align: bottom;
+}
+
+.finance_budget_expectedincome,.budget_subtable {
+	width: 100%;
+}
+
+#matrixchooser_left,#matrixchooser_right {
+	width: 200px;
+}
+
+.matrixcell {
+	background-color: white;
+	padding: 5px;
+}
+
+#dbstatusbar {
+	background-color:grey;
+	display:block;
+	position:fixed;
+	left:0px;
+	bottom:0px;
+	width:100%;
+}
+
+.atoggle {
+	cursor: pointer;
+	cursor: hand;
+	font-style:italic;
+}
+
+.inputtransaction {
+	cursor: hand;
+}

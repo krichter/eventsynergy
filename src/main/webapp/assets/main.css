@@ -1,0 +1,50 @@
+#outerbox {
+   	width: 100%;
+   	text-align: center;
+}
+#contentbox {
+    border:solid black 1px;
+    right:25%;
+    left:25%;
+    padding:15px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    width: 800px;
+	margin-left:auto;
+	margin-right:auto;
+	text-align: left;
+}
+body,td,th {
+   	font-family: Verdana;
+	font-size: 9pt;
+}
+
+th {
+	text-align: center;
+}
+
+.managecol,.backupcol,.restorecol {
+	text-align: center;
+}
+
+.restorecol {
+	width: 250px;
+	white-space:nowrap;
+}
+
+#transactiontable .titem {
+	border: 1px solid transparent;
+	font-size: 8pt;
+	background-color: white;
+}
+
+#transactiontable .thead {
+	border: 1px solid transparent;
+	font-size: 9pt;
+	background-color: white;
+}
+
+#transactiontable {
+	border: 1px solid transparent;
+}

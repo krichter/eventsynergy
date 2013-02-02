@@ -1,0 +1,70 @@
+#topheader,#topheader_finance,#bottomspacer,#dbstatusbar,.hidewhenprinting {
+	display: none;
+}
+
+.currencycell {
+	text-align: right;
+}
+
+.spend_firstname,.spend_lastname,.spend_history,.spend_vouch,.spend_totalremaining {
+	border: 1px solid black;
+	white-space: nowrap;
+}
+
+.spend_vouch,.spend_totalremaining {
+	text-align: right;	
+}
+
+.spend_blankcell {
+	width: 150px;	
+	border: 1px solid black;
+}
+ 
+td {
+	font-family: Verdana;
+	font-size: 8pt;
+	border: 1px solid #CCCCCC;
+    padding: 2px;
+}
+
+th {
+	font-family: Verdana;
+	font-size: 8pt;
+	font-weight: bold;
+}
+
+body {
+	font-family: Verdana;
+	font-size: 8pt;
+	margin: 0px;
+}
+
+#pointstable,#spendsheettable,#finance_paymenttable,table.finance_peopletable,table.finance_paymentdetails,#finance_spendertable,table.finance_spenderdetail,table.finance_budgettable,table.finance_budget_expectedincome,table.budget_subtable {
+	width: 100%;	
+}
+
+.pointsheaderrow {
+	background-color: #cccccc;
+}
+
+.noimage {
+	background-color:white;
+	width:150px;
+	height:150px;	
+}
+
+.finance_paymenttable_amount,.finance_paymentrow_amount {
+	width: 80px;
+}
+
+td.finance_paymenttable,td.finance_paymenttable_amount,td.finance_spendertable {
+	font-weight: bold;
+}
+
+table.finance_paymentdetails {
+	bottom-margin: 30px;
+}
+
+td.finance_paymentrow,td.finance_paymentrow_amount {
+	border: 0px;
+}
