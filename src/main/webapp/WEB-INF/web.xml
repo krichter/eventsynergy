@@ -15,7 +15,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
     
 	<filter>
 		<filter-name>jsondb</filter-name>
-		<filter-class>com.campsynergy2.JSONDBFilter</filter-class>
+		<filter-class>com.eventsynergy.JSONDBFilter</filter-class>
 	</filter>
 
 	<filter-mapping>
@@ -33,7 +33,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 	<servlet>
 		<servlet-name>appservlet</servlet-name>
 		<servlet-class>
-			com.campsynergy2.CSScalatraServlet
+			com.eventsynergy.CSScalatraServlet
 		</servlet-class>
 	</servlet>
 
