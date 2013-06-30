@@ -1,7 +1,7 @@
 package org.scalatra
 package fileupload
 
-import scala.language.postfixOps
+//import scala.language.postfixOps
 import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.fileupload.{FileItemFactory, FileItemStream}
 import collection.JavaConversions._

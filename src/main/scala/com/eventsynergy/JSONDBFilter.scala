@@ -15,7 +15,7 @@ import org.scalatra.fileupload.FileUploadSupport
 import java.util.logging.Logger;
 import java.text.DateFormat;
 import java.util.Date;
-import scala.language.implicitConversions;
+//import scala.language.implicitConversions;
 
 import freemarker.template._;
 

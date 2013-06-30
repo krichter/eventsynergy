@@ -2,9 +2,9 @@ name := "eventsynergy"
 
 version := "2.0"
 
-scalaVersion := "2.10.0"
+scalaVersion := "2.9.1"
 
-scalaVersion := "2.10.0"
+scalaVersion := "2.9.1"
 
 seq(webSettings :_*)
 
@@ -15,10 +15,10 @@ resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repos
 unmanagedBase <<= baseDirectory { base => base / "custom_lib" }
 
 libraryDependencies ++= Seq(
-  "org.scalatra" %% "scalatra" % "2.0.5-SNAPSHOT",
-  "org.scalatra" %% "scalatra-scalate" % "2.0.5-SNAPSHOT",
-  "org.scalatra" %% "scalatra-fileupload" % "2.0.5-SNAPSHOT",
-  "org.scalatra" %% "scalatra-specs2" % "2.0.5-SNAPSHOT" % "test",
+  "org.scalatra" %% "scalatra" % "2.0.4",
+  "org.scalatra" %% "scalatra-scalate" % "2.0.4",
+  "org.scalatra" %% "scalatra-fileupload" % "2.0.4",
+  "org.scalatra" %% "scalatra-specs2" % "2.0.4" % "test",
   "ch.qos.logback" % "logback-classic" % "1.0.6" % "runtime",
   "org.eclipse.jetty" % "jetty-webapp" % "8.1.7.v20120910" % "container;test",
   "net.liftweb" %% "lift-json" % "2.5-M4",

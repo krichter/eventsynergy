@@ -13,7 +13,7 @@ import org.scalatra.fileupload.FileUploadSupport
 import javax.mail._;
 import javax.mail.internet._;
 import java.util.logging.Logger;
-import scala.language.implicitConversions;
+//import scala.language.implicitConversions;
 
 import freemarker.template._;
 
