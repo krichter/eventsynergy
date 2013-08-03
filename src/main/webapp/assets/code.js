@@ -3415,14 +3415,8 @@ function reports_run() {
 		fieldlist.push({"id":fid,"label":$(this).text(),"type":preval});
 	});
 	//try { console.log("fieldlist ",fieldlist); } catch (e) {}
-	newwindow.document.write('<html><head><title></title>\
-		<link rel="stylesheet" type="text/css" href="/assets/printable.css"/>\
-		<link rel="stylesheet" type="text/css" media="screen" href="/assets/tablesorter/style.css"/>\
-		<script src="/assets/jquery-1.7.1.min.js" type="text/javascript" charset="utf-8"></script>\
-		<script src="/assets/jquery.tablesorter.js" type="text/javascript" charset="utf-8"></script>\
-		</head><body id="everythingcontainer"><H1 id="reporttitle"></H1></body></html>');
-	//'+reporttitle+'
-	//'+reporttitle+'
+	//newwindow.document.write('<html><head><title></title><link rel="stylesheet" type="text/css" href="/assets/printable.css"/><link rel="stylesheet" type="text/css" media="screen" href="/assets/tablesorter/style.css"/><script src="/assets/jquery-1.7.1.min.js" type="text/javascript" charset="utf-8"></script><script src="/assets/jquery.tablesorter.js" type="text/javascript" charset="utf-8"></script></head><body id="everythingcontainer"><h1 id="reporttitle"></h1></body></html>');
+	newwindow.document.write('<html><head><title></title></head><body id="everythingcontainer"><h1 id="reporttitle"></h1></body></html>');
 	$("#reporttitle",newwindow.document).text(reporttitle);
 	$("title",newwindow.document).text(reporttitle);
 
