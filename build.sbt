@@ -6,7 +6,7 @@ scalaVersion := "2.9.1"
 
 scalaVersion := "2.9.1"
 
-seq(webSettings :_*)
+//seq(webSettings :_*)
 
 classpathTypes ~= (_ + "orbit")
 
@@ -26,3 +26,5 @@ libraryDependencies ++= Seq(
 )
 
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+
+appengineSettings

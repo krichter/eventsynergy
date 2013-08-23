@@ -910,7 +910,7 @@ function groups_load(openedid) {
 					if (!hasleaders) {
 						countlabel = gtotal+"m";
 					}
-					$("#accordian_grouparea > div:last ul.grouplist").append("<li class='groupitem' groupid='"+groupid+"'><span class='grouplabel'></span> - <a href='#' onClick='return groups_modifygroup(\""+gaid+"\",\""+groupid+"\");'>Modify</a> - <a href='#' onClick='return groups_removegroup(\""+gaid+"\",\""+groupid+"\");'>Remove</a> - <a href='#' onClick='return groups_view(\""+gaid+"\",\""+groupid+"\");'>View</a> - <a href='#' onClick='return shop_input(\""+gaid+"\",\""+groupid+"\");'>Shop Input</a> - <a href='#' onClick='return shop_sheet(\""+gaid+"\",\""+groupid+"\");'>Shop Sheet</a></li>");
+					$("#accordian_grouparea > div:last ul.grouplist").append("<li class='groupitem' groupid='"+groupid+"'><span class='grouplabel'></span> - <a href='#' onClick='return groups_modifygroup(\""+gaid+"\",\""+groupid+"\");'>Modify</a> - <a href='#' onClick='return groups_removegroup(\""+gaid+"\",\""+groupid+"\");'>Remove</a> - <a href='#' onClick='return groups_view(\""+gaid+"\",\""+groupid+"\");'>View</a> - <a href='#' onClick='return shop_input(\""+gaid+"\",\""+groupid+"\");'>Shop Input</a> - <a href='#' onClick='return shop_sheet(\""+gaid+"\",\""+groupid+"\");'>Shop Sheet</a> - <a href='#' onClick='return report_fulldata(\""+gaid+"\",\""+groupid+"\",false);'>Full Data Report</a></li>");
 					$("#accordian_grouparea > div:last ul.grouplist > li:last > span.grouplabel").text(group["label"]+" ("+countlabel+")");
 				}
 			}
@@ -2514,6 +2514,175 @@ function peoplefinance_load() {
 	}
 }
 
+function report_fulldata(groupareaid,groupid,showfinancial) {
+	var newwindow = window.open('','_blank','status=1,toolbar=1,location=1,menubar=1,statusbar=1');
+	
+	newwindow.document.write('<html><head><title></title></head><body id="everythingcontainer"></body></html>');
+	$("head",newwindow.document).append('<link rel="stylesheet" type="text/css" href="/assets/fulldata.css">');
+
+	$("title",newwindow.document).text("Full Data Report");
+
+	function report_fulldata_record(personid,target) {
+		var persondata = JSONDB.jsondb["people"][personid];
+		var record = $("<div style='page-break-after: always;' class='personrecord'><table width='100%'><tr><td width='50%' valign='top'>" +
+				"<table>" +
+				"<tr><td class='fieldlabel'>First Name: </td><td class='fielddata'><span class='firstname'></span></td></tr>" +
+				"<tr><td class='fieldlabel'>Last Name: </td><td class='fielddata'><span class='lastname'></span></td></tr>" +
+				"<tr><td class='fieldlabel'>Home Phone: </td><td class='fielddata'><span class='homephone'></span></td></tr>" +
+				"<tr><td class='fieldlabel'>Mobile Phone: </td><td class='fielddata'><span class='mobilephone'></span></td></tr>" +
+				"<tr><td class='fieldlabel'>Email: </td><td class='fielddata'><span class='email'></span></td></tr>" +
+				"<tr><td class='fieldlabel'>Parents Name: </td><td class='fielddata'><span class='parents_name'></span></td></tr>" +
+				"<tr><td class='fieldlabel'>Parents Phone: </td><td class='fielddata'><span class='parents_phone'></span></td></tr>" +
+				"<tr><td class='fieldlabel'>Emergency Information: </td class='fielddata'><td><span class='emergencyinfo'></span></td></tr>" +
+				"<tr><td class='fieldlabel'>Care Card: </td><td class='fielddata'><span class='carecard'></span></td></tr>" +
+				"<tr><td class='fieldlabel'>Birthdate: </td><td class='fielddata'><span class='birthdate'></span></td></tr>" +
+				"<tr><td class='fieldlabel'>Age: </td><td class='fielddata'><span class='age'></span></td></tr>" +
+				"<tr><td class='fieldlabel'>Gender: </td><td class='fielddata'><span class='gender'></span></td></tr>" +
+				"<tr><td class='fieldlabel'>Affiliation: </td><td class='fielddata'><span class='affiliation'></span></td></tr>" +
+				"</table></td><td width='50%' valign='top'>" +
+				"<span class='fieldlabel'>Address:</span><br/>" +
+					"<table><tr><td class='fieldlabel'>Street: </td><td class='fielddata'><span class='address_street'></span></td></tr>" +
+					"<tr><td class='fieldlabel'>City: </td><td class='fielddata'><span class='address_city'></span></td></tr>" +
+					"<tr><td class='fieldlabel'>Postal: </td><td class='fielddata'><span class='address_postal'></span></td></tr>" +
+					"<tr><td>&nbsp;</td></tr>" +
+					"<tr><td valign='top' class='fieldlabel'>Comments: </td><td class='fielddata'><span class='comments'></span></td></tr>" +
+					"<tr><td valign='top' class='fieldlabel'>Photo: </td><td><div id='personphoto'></div></td></tr>" +
+					"</table>" +
+				"</td></tr><tr><td valign='top'>" +
+				"<table id='customdata'></table></td><td valign='top'>" +
+				"<table id='grouptable'></table></td></tr></table>" +
+				"</div>");
+		
+		$(".firstname",record).text(persondata["firstname"]);
+		$(".lastname",record).text(persondata["lastname"]);
+		$(".homephone",record).text(persondata["homephone"]);
+		$(".mobilephone",record).text(persondata["mobilephone"]);
+		$(".email",record).text(persondata["email"]);
+		$(".parents_name",record).text(persondata["parents_name"]);
+		$(".parents_phone",record).text(persondata["parents_phone"]);
+		$(".emergencyinfo",record).text(persondata["emergencyinfo"]);
+		$(".carecard",record).text(persondata["carecard"]);
+		$(".birthdate",record).text(persondata["birthdate"]);
+		$(".age",record).text(getage(parsedate(persondata["birthdate"])));
+		$(".gender",record).text(persondata["gender"]);
+		$(".address_street",record).text(persondata["address_street"]);
+		$(".address_city",record).text(persondata["address_city"]);
+		$(".address_postal",record).text(persondata["address_postal"]);
+		$(".comments",record).html("<div>"+nl2br(safeforhtml(persondata["comments"]))+"</div>");
+		
+		showimage($("#personphoto",record),persondata["picturefileid"],"small",false);
+		
+		$(".affiliation",record).text(report_getaffiliationname(persondata["affiliation"]));
+		
+		record.children("#customtable").empty();
+		if (JSONDB.jsondb.hasOwnProperty("settings") && JSONDB.jsondb["settings"].hasOwnProperty("customordering")) {
+			for (var i in JSONDB.jsondb["settings"]["customordering"]) {
+				var cfield = JSONDB.jsondb["settings"]["customfields"][JSONDB.jsondb["settings"]["customordering"][i]];
+				var thevalue = "";
+				try {
+					thevalue = persondata["customfields"][cfield["id"]];
+				} catch (e) {}
+				
+				var row = $("<tr><td class='fieldlabel fieldname'></td><td class='fielddata value'></td></tr>")
+				row.children(".fieldname").text(cfield["fieldname"]+":");
+				row.children(".value").text(thevalue)
+				$("#customdata",record).append(row);
+			}
+		}
+		/*
+		if (settings_get("useshop") != "yes") {
+			$("#modal_person_shoparea").css("display","none");
+		} else {
+			$("#modal_person_field_shopvouch").text(persondata["shopvouch"]);
+		}
+
+		$("#modal_person_financetable").empty();
+		*/
+		$("#grouptable",record).empty();
+		var moneybalance = 0.00;
+		
+		for (i in JSONDB.jsondb["groupareas"]["orderarray"]) {
+			var ga = JSONDB.jsondb["groupareas"][JSONDB.jsondb["groupareas"]["orderarray"][i]];
+			var selectedgroup = "Nothing Chosen";
+			var viewhtml = "";
+			var leaderhtml = "";
+			var thismodifier = 0.00;
+			
+			for (x in persondata["groupselection"]) {
+				if (x == ga["id"]) {
+					var gs = persondata["groupselection"][x];
+					if (ga["groups"].hasOwnProperty(gs["groupid"])) {
+						selectedgroup = ga["groups"][gs["groupid"]]["label"];
+						thismodifier = ga["groups"][gs["groupid"]]["modifier"];
+						if (gs["isleader"] == true) {
+							leaderhtml = " (Leader)";
+						}
+						//viewhtml = " <input type='button' value='View' onClick='closecheck(\"groups_view(\\\""+ga["id"]+"\\\",\\\""+gs["groupid"]+"\\\")\");'/>";
+						viewhtml = "";
+					}
+					break;
+				}
+			}
+			
+			var row1 = $("<tr><td class='fieldlabel label'></td><td><span class='grouplabel fielddata'></span><span class='viewhtml'></span></td></tr>")
+			row1.children(".label").text(ga["label"]+":");
+			row1.find(".grouplabel").text(selectedgroup+leaderhtml);
+			row1.find(".viewhtml").html(viewhtml);
+			$("#grouptable",record).append(row1);
+			/*
+			var row2 = $("<tr><td class='modal_person_financetable_type'>Cost</td><td class='modal_person_financetable_label label'></td><td class='modal_person_financetable_modifier thecost'></td></tr>");
+			row2.children(".label").text(ga["label"]+": "+selectedgroup);
+			row2.children(".thecost").text(fd(thismodifier));
+			$("#modal_person_financetable").append(row2);
+			moneybalance = moneybalance + parsef(thismodifier);
+			*/
+		}
+		
+		/*
+		if (settings_get("useshop") == "yes") {
+			var row = $("<tr><td class='modal_person_financetable_type'>Cost</td><td class='modal_person_financetable_label'>Shop Vouch</td><td class='modal_person_financetable_modifier vouchvalue'></td></tr>")
+			row.children(".vouchvalue").text(fd(persondata["shopvouch"]))
+			$("#modal_person_financetable").append(row);
+			moneybalance = moneybalance + parsef(persondata["shopvouch"]);
+		}
+		
+		// Money in
+		for (i in JSONDB.jsondb["moneyin"]) {
+			for (x in JSONDB.jsondb["moneyin"][i]["allocation"]) {
+				var desc = JSONDB.jsondb["moneyin"][i]["description"]
+				var alloc = JSONDB.jsondb["moneyin"][i]["allocation"][x];
+				if (alloc["type"] == "person" && alloc["refid"] == persondata["id"]) {
+					var row = $("<tr><td class='modal_person_financetable_type'>In</td><td class='modal_person_financetable_label desc'></td><td class='modal_person_financetable_modifier amount'></td></tr>");
+					row.children(".desc").text(desc);
+					row.children(".amount").text(fd(parsef(alloc["amount"])));
+					$("#modal_person_financetable").append(row);
+					moneybalance = moneybalance - parsef(alloc["amount"]);
+				}
+			}
+		}
+
+		var sumrow = $("<tr><td colspan='2' class='modal_person_financetable_total'>Total Owing:</td><td class='modal_person_financetable_modifier balance'></td></tr>");
+		sumrow.children(".balance").text(fd(moneybalance));
+		$("#modal_person_financetable").append(sumrow);
+		*/
+		
+		$("body",target).append(record);
+	}
+	
+	var ga = JSONDB.jsondb["groupareas"][groupareaid];
+	var g = ga["groups"][groupid];
+		
+	for (i in JSONDB.jsondb["people"]) {
+		try {
+			var p = JSONDB.jsondb["people"][i];
+			if (p["groupselection"][groupareaid]["groupid"] == groupid) {
+				report_fulldata_record(i,newwindow.document);
+			}
+		} catch (e3) {}
+	}
+	$(".personrecord:last",newwindow.document).css("page-break-after","avoid");
+}
+
 function report_getaffiliationname(affiliationid) {
 	var toreturn = "";
 	try {
@@ -3306,6 +3475,7 @@ function reports_load() {
 	$("#modal_createreport_left").append($("<option></option>").attr("value","c_shopamount").text("Shop Vouch Amount"));
 	$("#modal_createreport_left").append($("<option></option>").attr("value","c_cost").text("Total Cost"));
 	$("#modal_createreport_left").append($("<option></option>").attr("value","r_signedin").text("Signed-in Status"));
+	$("#modal_createreport_left").append($("<option></option>").attr("value","c_regstamp").text("Registration Stamp"));
 	$("#modal_createreport_left").append($("<option></option>").attr("value","c_paid").text("Total Paid"));
 	$("#modal_createreport_left").append($("<option></option>").attr("value","c_owing").text("Total Owing"));
 	$("#modal_createreport_left").append($("<option></option>").attr("value","c_shopspent").text("Total Shop Spent"));
@@ -3419,6 +3589,8 @@ function reports_run() {
 	newwindow.document.write('<html><head><title></title></head><body id="everythingcontainer"><h1 id="reporttitle"></h1></body></html>');
 	$("#reporttitle",newwindow.document).text(reporttitle);
 	$("title",newwindow.document).text(reporttitle);
+	$("head",newwindow.document).append('<link rel="stylesheet" type="text/css" href="/assets/printable.css" media="print">');
+	$("head",newwindow.document).append('<link rel="stylesheet" type="text/css" href="/assets/tablesorter/style.css" media="screen">');
 
 	var phash = {};
 	for (i in JSONDB.jsondb["moneyin"]) {
@@ -3475,6 +3647,13 @@ function reports_run() {
 					thevalue = "";
 					if (f["id"] == "age") {
 						thevalue = getage(parsedate(p["birthdate"])); 
+					} else if (f["id"] == "regstamp") {
+						if (p["registrationid"] == "" || p["registrationid"] == 0) {
+							thevalue = "N/A"
+						} else {
+							var regrecord = JSONDB.jsondb["registrations"][p["registrationid"]];
+							thevalue = regrecord.submitstamp;
+						}
 					} else if (f["id"] == "address") {
 						thevalue = p["address_street"]+", "+p["address_city"]+", "+p["address_postal"];
 					} else if (f["id"] == "affiliation") {
@@ -3538,6 +3717,8 @@ function reports_run() {
 					var thevalue = "0";
 					if (f["id"] == "shopspent") {
 						thevalue = fd(total_shopspent);
+					} else if (f["id"] == "regstamp") {
+						thevalue = "";
 					} else if (f["id"] == "paid") {
 						thevalue = fd(total_paid);
 					} else if (f["id"] == "cost") {

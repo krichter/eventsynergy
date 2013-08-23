@@ -2,8 +2,8 @@
 <head>
 	<title>Register for ${eventtitle} - Event Synergy</title>
 	<link rel="stylesheet" type="text/css" media="screen" href="/assets/ui-lightness/jquery-ui-1.8.13.custom.css"/>
-	<script src="/assets/jquery-1.6.1.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/assets/jquery-ui-1.8.13.custom.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/assets/jquery-1.7.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/assets/jquery-ui-1.8.18.custom.min.js" type="text/javascript" charset="utf-8"></script>
 	<script>
 /*	$(function() {
 		$( "#birthdate" ).datepicker({

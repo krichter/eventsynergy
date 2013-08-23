@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<title>Event Manager</title>
-	<script src="/assets/jquery-1.6.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/assets/jquery-1.7.1.min.js" type="text/javascript" charset="utf-8"></script>
 	<link rel="stylesheet" type="text/css" media="screen" href="/assets/main.css">
 </head>
 <body>
