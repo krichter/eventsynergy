@@ -2067,7 +2067,9 @@ function shop_sheet(groupareaid,groupid) {
 	var groupname = JSONDB.jsondb["groupareas"][groupareaid]["groups"][groupid]["label"];
 	
 	var newwindow = window.open('','_blank','status=1,toolbar=1,location=1,menubar=1,statusbar=1');
-	newwindow.document.write('<html><head><title>Spending Sheet Report</title><link rel="stylesheet" type="text/css" href="/assets/printable.css"/></head><body><h3>'+groupname+'</h3><table id="spendsheettable"><thead><tr><th>First Name</th><th>Last Name</th><th>Starting</th><th>Remaining</th><th>History</th></tr></thead><tbody id="datatable"></tbody></table><br/><br/>Total Amount Vouched: <span id="mastervouch"></span><br/>Total Spent: <span id="masterspend"></span></body></html>');
+	newwindow.document.write('<html><head><title>Spending Sheet Report</title></head><body><h3>'+groupname+'</h3><table id="spendsheettable"><thead><tr><th>First Name</th><th>Last Name</th><th>Starting</th><th>Remaining</th><th>History</th></tr></thead><tbody id="datatable"></tbody></table><br/><br/>Total Amount Vouched: <span id="mastervouch"></span><br/>Total Spent: <span id="masterspend"></span></body></html>');
+	$("head",newwindow.document).append('<link rel="stylesheet" type="text/css" href="/assets/printable.css"/>');
+	
 	var mastervouch = 0.00;
 	var masterspend = 0.00;
 
