@@ -171,6 +171,11 @@
 					<thead><tr>
 						<th class="affiliation_datalist">Label</th>
 						<th class="affiliation_datalist">Count</th>
+						<th class="affiliation_datalist"># Unpaid People</th>
+						<th class="affiliation_datalist">Amount</th>
+						<th class="affiliation_datalist"># Unpaid Vouchers</th>
+						<th class="affiliation_datalist">Amount</th>
+						<th class="affiliation_datalist">Total Owing</th>
 						<th class="affiliation_datalist" colspan='3'>Options</th>
 					</tr></thead>
 					<tbody id="affiliation_datalist"></tbody>

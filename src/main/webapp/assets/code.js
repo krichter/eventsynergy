@@ -1253,41 +1253,118 @@ function affiliationgroup_add() {
 
 affiliation_sortset = false;
 function affiliationgroup_load() {
-	//affiliation_datalist_master
 	try { console.log("affiliationgroup_load"); } catch (e) {}
 	$("#affiliation_datalist").empty();
 	
-	var counthash = {};
-	counthash["other"] = 0;
-	if (JSONDB.jsondb.hasOwnProperty("affiliation")) {
-		for (personid in JSONDB.jsondb["people"]) {
-			var p = JSONDB.jsondb["people"][personid];
-			if (p.hasOwnProperty("affiliation")) {
-				if (JSONDB.jsondb["affiliation"].hasOwnProperty(p["affiliation"])) {
-					if (!counthash.hasOwnProperty(p["affiliation"])) {
-						counthash[p["affiliation"]] = 0;
-					}
-					counthash[p["affiliation"]] = counthash[p["affiliation"]] + 1; 
-				} else {
-					if (!counthash.hasOwnProperty("other")) {
-						counthash["other"] = 0;
-					}
-					counthash["other"] = counthash["other"] + 1; 
+	var phash = {};
+	for (i in JSONDB.jsondb["moneyin"]) {
+		var m = JSONDB.jsondb["moneyin"][i];
+		for (x in m["allocation"]) {
+			var aitem = m["allocation"][x];
+			if (aitem["type"] == "person") {
+				if (!phash.hasOwnProperty(aitem["refid"])) {
+					phash[aitem["refid"]] = 0;
 				}
-			} else {
-				if (!counthash.hasOwnProperty("other")) {
-					counthash["other"] = 0;
-				}
-				counthash["other"] = counthash["other"] + 1;
+				phash[aitem["refid"]] = phash[aitem["refid"]] + parsef(aitem["amount"]);
 			}
 		}
 	}
-	//try { console.log("counthash",counthash); } catch (e) {}
+	
+	var vhash = {};
+	var ahash = {};
+	var acounthash = {};
+	for (i in JSONDB.jsondb["moneyin"]) {
+		var m = JSONDB.jsondb["moneyin"][i];
+		for (x in m["allocation"]) {
+			var aitem = m["allocation"][x];
+			if (aitem["type"] == "voucher") {
+				if (!vhash.hasOwnProperty(aitem["refid"])) {
+					vhash[aitem["refid"]] = 0;
+				}
+				vhash[aitem["refid"]] = vhash[aitem["refid"]] + parsef(aitem["amount"]);
+			}
+		}
+	}
+	
+	var vcount = 0;
+	for (i in JSONDB.jsondb["moneyin"]) {
+		var m = JSONDB.jsondb["moneyin"][i];
+		if (m["isvoucher"] == "1") {
+			var a = JSONDB.jsondb["affiliation"][m["voucheraffiliation"]];
+			var vbalance = parsef(m["total"]) - parsef(vhash[m["id"]]);
+			if (!ahash.hasOwnProperty(m["voucheraffiliation"])) {
+				ahash[m["voucheraffiliation"]] = 0;
+				acounthash[m["voucheraffiliation"]] = 0;
+			}
+			ahash[m["voucheraffiliation"]] = ahash[m["voucheraffiliation"]] + vbalance;
+			if (vbalance > 0.00) {
+				acounthash[m["voucheraffiliation"]] = acounthash[m["voucheraffiliation"]] + 1; 
+			}
+			vcount = vcount + 1;
+		}
+	}	
+	
+	var counthash = {};
+	counthash["other"] = {"count":0,"balance":0.00,"unpaidpersoncount":0,"voucherbalance":0.00,"unpaidvouchercount":0};
+	if (JSONDB.jsondb.hasOwnProperty("affiliation")) {
+		for (personid in JSONDB.jsondb["people"]) {
+			var p = JSONDB.jsondb["people"][personid];
+			
+			var thiscost = 0;
+			for (x in p["groupselection"]) {
+				thiscost = thiscost + report_getgroupcost(x,p["groupselection"][x]["groupid"]);
+			}
+			try {
+				thiscost = thiscost + parsef(p["shopvouch"]);
+			} catch (e) {}
+			
+			var thispaid = parsef(phash[p["id"]]);
+			var balance = thiscost - thispaid;
+			
+			
+			if (p.hasOwnProperty("affiliation")) {
+				if (JSONDB.jsondb["affiliation"].hasOwnProperty(p["affiliation"])) {
+					if (!counthash.hasOwnProperty(p["affiliation"])) {
+						counthash[p["affiliation"]] = {"count":0,"balance":0.00,"unpaidpersoncount":0,"voucherbalance":0.00,"unpaidvouchercount":0};
+					}
+					counthash[p["affiliation"]]["count"] = counthash[p["affiliation"]]["count"] + 1;
+					counthash[p["affiliation"]]["balance"] = counthash[p["affiliation"]]["balance"] + balance;
+					if (balance > 0) {
+						counthash[p["affiliation"]]["unpaidpersoncount"] = counthash[p["affiliation"]]["unpaidpersoncount"] + 1;
+					}
+				} else {
+					if (!counthash.hasOwnProperty("other")) {
+						counthash["other"] = {"count":0,"balance":0.00,"unpaidpersoncount":0,"voucherbalance":0.00,"unpaidvouchercount":0};
+					}
+					counthash["other"]["count"] = counthash["other"]["count"] + 1;
+					counthash["other"]["balance"] = counthash["other"]["balance"] + balance;
+					if (balance > 0) {
+						counthash["other"]["unpaidpersoncount"] = counthash["other"]["unpaidpersoncount"] + 1;
+					}
+				}
+			} else {
+				if (!counthash.hasOwnProperty("other")) {
+					counthash["other"] = {"count":0,"balance":0.00,"unpaidpersoncount":0,"voucherbalance":0.00,"unpaidvouchercount":0};
+				}
+				counthash["other"]["count"] = counthash["other"]["count"] + 1;
+				counthash["other"]["balance"] = counthash["other"]["balance"] + balance;
+				if (balance > 0) {
+					counthash["other"]["unpaidpersoncount"] = counthash["other"]["unpaidpersoncount"] + 1;
+				}
+			}
+		}
+	}
+	try { console.log("counthash",counthash); } catch (e) {}
 	
 	for (id in JSONDB.jsondb["affiliation"]) {
 		$("#affiliation_datalist").append("<tr class='affiliation_datalist' id='affiliationrow_"+id+"'>\n\
 			<td class='affiliation_datalist' id='affiliation_row_"+id+"_label'></td>\n\
 			<td class='affiliation_datalist' id='affiliation_row_"+id+"_count'></td>\n\
+			<td class='affiliation_datalist' id='affiliation_row_"+id+"_unpaidpeople'></td>\n\
+			<td class='affiliation_datalist' id='affiliation_row_"+id+"_unpaidpeopleamount'></td>\n\
+			<td class='affiliation_datalist' id='affiliation_row_"+id+"_unpaidvouchers'></td>\n\
+			<td class='affiliation_datalist' id='affiliation_row_"+id+"_unpaidvoucheramount'></td>\n\
+			<td class='affiliation_datalist' id='affiliation_row_"+id+"_totalowing'></td>\n\
 			<td class='affiliation_datalist centerit'><input type='button' value='View' onClick='affiliationgroup_view(\""+id+"\");'/></td>\n\
 			<td class='affiliation_datalist centerit'><input type='button' value='Mod' onClick='affiliationgroup_modify(\""+id+"\");'/></td>\n\
 			<td class='affiliation_datalist centerit'><input type='button' value='Delete' onClick='affiliationgroup_delete(\""+id+"\");'/></td>\n\
@@ -1295,13 +1372,22 @@ function affiliationgroup_load() {
 		$("#affiliation_row_"+id+"_label").text(JSONDB.jsondb["affiliation"][id]["groupname"]);
 		
 		var thecount = 0;
+		var thebalance = 0;
+		var unpaidpeoplecount = 0;
 		if (counthash.hasOwnProperty(id)) {
-			thecount = counthash[id];
+			thecount = counthash[id]["count"];
+			thebalance = counthash[id]["balance"];
+			unpaidpeoplecount = counthash[id]["unpaidpersoncount"];
 		}
 		$("#affiliation_row_"+id+"_count").text(thecount);
+		$("#affiliation_row_"+id+"_unpaidpeopleamount").text(fd(thebalance));
+		$("#affiliation_row_"+id+"_unpaidpeople").text(parsef(unpaidpeoplecount));
+		$("#affiliation_row_"+id+"_unpaidvoucheramount").text(fd(parsef(ahash[id])));
+		$("#affiliation_row_"+id+"_unpaidvouchers").text(parsef(acounthash[id]));
+		$("#affiliation_row_"+id+"_totalowing").text(fd(parsef(thebalance) + parsef(ahash[id])));
 	}
 	
-	$("#affiliationgroup_viewunaffiliatedbutton").attr("value"," View Unaffiliated ("+counthash["other"]+" People) ");
+	$("#affiliationgroup_viewunaffiliatedbutton").attr("value"," View Unaffiliated ("+counthash["other"]["count"]+" People) ");
 	
 	if (!jQuery.isEmptyObject(JSONDB.jsondb["affiliation"]) && !affiliation_sortset) {
 		$("#affiliation_datalist_master").trigger("update",[[[0,0]]]);
