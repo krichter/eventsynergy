@@ -17,8 +17,15 @@
 	function checkit() {
 		var isok = true;
 		$(".manditoryfield").each(function(i) {
-			//try { console.log("check"); } catch (e) {}
-			if ($(this).val() == "") {
+			//try { console.log("check",$(this),i); } catch (e) {}
+			if ($(this).attr("type") == "radio") {
+				checkfieldname = $(this).attr("name");
+				checkval = $('input[name='+checkfieldname+']').filter(':checked').val();
+				//console.log(checkval);
+				if(typeof checkval === 'undefined'){
+					isok = false;
+				};
+			} else if ($(this).val() == "") {
 				isok = false;
 			}
 		});
@@ -292,7 +299,7 @@
 		
 		<hr/>
 		<#list groupmap as grouparea>
-			<h3>${grouparea.label()}</h3>
+			<h3>${grouparea.label()} <#if grouparea.ismanditory() == "1">*</#if></h3>
 			${grouparea.description()}<br/>
 			<table>
 			<#if grouparea.ismanditory() == "0">
@@ -304,11 +311,7 @@
 			</#if>
 			<#list grouparea.groups() as group>
 				<tr>
-					<td class='groupselectioncell'><#if group_index==0 && grouparea.ismanditory() == "1">
-						<input type='radio' name='grouparea_${grouparea.groupareaid()}' value='${group.groupid()}' checked/>
-					<#else>
-						<input type='radio' name='grouparea_${grouparea.groupareaid()}' value='${group.groupid()}'/>
-					</#if></td>
+					<td class='groupselectioncell'><input type='radio' name='grouparea_${grouparea.groupareaid()}' value='${group.groupid()}'<#if grouparea.ismanditory() == "1"> class='manditoryfield'</#if>/></td>
 					<td class='groupselectioncell'>${group.label()}</td>
 					<td class='groupselectioncell currencycell'>${group.modifier()}</td>
 					</tr> 

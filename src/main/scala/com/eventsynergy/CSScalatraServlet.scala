@@ -106,7 +106,7 @@ class CSScalatraServlet extends ScalatraServlet with FileUploadSupport {
 			}
 			
 			try {
-				db("affiliation").asInstanceOf[scala.collection.immutable.Map[String,Any]].foreach(item => {
+				db.getOrElse("affiliation", Map[String,Any]().toMap).asInstanceOf[scala.collection.immutable.Map[String,Any]].foreach(item => {
 					val a = item._2.asInstanceOf[scala.collection.immutable.Map[String,Any]]
 					affiliationgroups += Affiliationgroup(a.getOrElse("id","").toString(),a.getOrElse("groupname","").toString())
 				})
@@ -121,8 +121,8 @@ class CSScalatraServlet extends ScalatraServlet with FileUploadSupport {
 			}
 			
 			try {
-				val fieldmap = db("settings").asInstanceOf[scala.collection.immutable.Map[String,Any]]("customfields").asInstanceOf[scala.collection.immutable.Map[String,Any]]
-				db("settings").asInstanceOf[scala.collection.immutable.Map[String,Any]]("customordering").asInstanceOf[List[String]].foreach(fieldid => {
+				val fieldmap = db("settings").asInstanceOf[scala.collection.immutable.Map[String,Any]].getOrElse("customfields", Map[String,Any]().toMap).asInstanceOf[scala.collection.immutable.Map[String,Any]]
+				db("settings").asInstanceOf[scala.collection.immutable.Map[String,Any]].getOrElse("customordering", List[String]()).asInstanceOf[List[String]].foreach(fieldid => {
 					val field = fieldmap(fieldid).asInstanceOf[scala.collection.immutable.Map[String,Any]]
 					if (field.getOrElse("isonreg","").toString() == "1") {
 						var options = new ListBuffer[String]();
@@ -468,10 +468,10 @@ class CSScalatraServlet extends ScalatraServlet with FileUploadSupport {
 				case e:Throwable => printerror(e)
 			}
 		}
-		if (shopamount != "") {
+		if (shopamount != "" && shopamount != null) {
 			groupsummary += "Candy Cabin: "+Utils.dollerfy(shopamount)+"\n";
 			try {
-				totalcost = totalcost + shopamount.toDouble;	
+				totalcost = totalcost + shopamount.toDouble;
 			} catch {
 				case e:Throwable => log.severe(e.getStackTraceString)
 			}
