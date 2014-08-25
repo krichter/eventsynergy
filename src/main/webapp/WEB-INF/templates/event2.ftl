@@ -353,7 +353,7 @@
 				
 				<div style="display:none" id="modal_moneyin">
 					Description of Payment (Type, Cheque #, Made-out-to, from): <input type="text" size="60" id="modal_moneyin_description"/><br/>
-					Total Payment: $<input type="text" id="modal_moneyin_totalpayment" size="7" value="0.00"/><br/>
+					<!--//Total Payment: $<input type="text" id="modal_moneyin_totalpayment" size="7" value="0.00"/><br/>//-->
 					Is Voucher? <input type="checkbox" id="model_moneyin_isvoucher"/> <select id="modal_moneyin_voucheraffiliation"></select><br/>
 					<br/><br/>
 					Allocation:<br/>
@@ -364,7 +364,8 @@
 					</table>
 					<input type="button" value="Add Additional Allocation" id="model_moneyin_addallocationbutton"/>
 					<br/><br/>
-					<input type="button" id="modal_moneyin_savebutton" value="Save"/> <input class='contact-cancel contact-button simplemodal-close' type='button' value='Cancel'/>
+					Current Total: <b><span id='modal_moneyin_total'></span></b> - Is this correct?
+					<input type="button" id="modal_moneyin_savebutton" value="Yes and Save"/> <input class='contact-cancel contact-button simplemodal-close' type='button' value='Cancel'/>
 				</div>
 			</div>
 			<!--//

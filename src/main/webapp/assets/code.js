@@ -2298,11 +2298,28 @@ function moneyin_show() {
 	$("#modal_moneyin_voucheraffiliation").append(aselect);
 	$("#model_moneyin_addallocationbutton").click(function() {
 		$("#model_moneyin_allocationtable").append("<tr><td class='allocationrow'>Amount: $<input type='text' size='6' class='allocationamount' value='0.00'/> Apply to: <select class='allocationdirection'>"+selectlist+"</select><input type='button' value='Remove' onClick='removeallocation(this);'/></td></tr>");
+		$(".allocationamount").unbind("change");
+		$(".allocationamount").change(function(e) {moneyin_update_total();});
 	});
+}
+
+function moneyin_update_total() {
+	var temptotal = 0.00;
+	$(".allocationrow").each(function(i,element) {
+		var itemval = $(".allocationamount",this).val();
+		//var itemdirection = $(".allocationdirection",this).val();
+		if (itemval != "" && parseFloat(itemval) > 0) {
+			temptotal = parseFloat(temptotal) + parseFloat(itemval);
+		}
+	});
+	$("#modal_moneyin_total").text(fd(temptotal));
 }
 
 function moneyin_add() {
 	moneyin_show();
+	$(".allocationamount").unbind("change");
+	$(".allocationamount").change(function(e) {moneyin_update_total();});
+	moneyin_update_total();
 	
 /*	$("#model_moneyin_isvoucher").change(function() {
 		try { console.log("check change"); } catch (e2) {}
@@ -2320,9 +2337,10 @@ function moneyin_add() {
 				temptotal = parseFloat(temptotal) + parseFloat(itemval);
 			}
 		});
-		if (temptotal != parseFloat($("#modal_moneyin_totalpayment").val())) {
-			alert("Total of Allocation does not match total payment");
-		} else if ($("#modal_moneyin_description").val() == "") {
+		//if (temptotal != parseFloat($("#modal_moneyin_totalpayment").val())) {
+		//	alert("Total of Allocation does not match total payment");
+		//} else 
+		if ($("#modal_moneyin_description").val() == "") {
 			alert("No description given.");
 		} else if (temptotal == 0) {
 			alert("No amounts enterred");
@@ -2330,7 +2348,8 @@ function moneyin_add() {
 			var paymentid = JSONDB.generateid();
 			var t = {"action":"addmoneyin","params":{"id":paymentid}};
 			t["params"]["description"] = $("#modal_moneyin_description").val();
-			t["params"]["total"] = $("#modal_moneyin_totalpayment").val();
+			//t["params"]["total"] = $("#modal_moneyin_totalpayment").val();
+			t["params"]["total"] = temptotal;
 			var isvoucher = "0"; if ($("#model_moneyin_isvoucher").is(':checked')) { isvoucher = "1"; }
 			t["params"]["isvoucher"] = isvoucher;
 			t["params"]["voucheraffiliation"] = $("#modal_moneyin_voucheraffiliation").val();
@@ -2366,9 +2385,10 @@ function moneyin_add() {
 
 function moneyin_mod(transactionid) {
 	moneyin_show();
+
 	var m = JSONDB.jsondb["moneyin"][transactionid];
 	$("#modal_moneyin_description").val(m["description"]);
-	$("#modal_moneyin_totalpayment").val(m["total"]);
+	//$("#modal_moneyin_totalpayment").val(m["total"]);
 	if (m["isvoucher"] == "1") { $("#model_moneyin_isvoucher").attr('checked',true); } else { $("#model_moneyin_isvoucher").attr('checked',false); }
 	$("#modal_moneyin_voucheraffiliation").val(m["voucheraffiliation"]);
 	var selectlist = $("#modal_moneyin_initalselect").html();
@@ -2385,7 +2405,11 @@ function moneyin_mod(transactionid) {
 		$(".allocationrow:last > .allocationdirection").val(refid);
 //		$(".allocationrow:last").attr("allocationid",refid);
 	}
-	
+
+	$(".allocationamount").unbind("change");
+	$(".allocationamount").change(function(e) {moneyin_update_total();});
+	moneyin_update_total();
+
 /*	$("#model_moneyin_isvoucher").change(function() {
 		try { console.log("check change"); } catch (e2) {}
 		//var signedin = "0"; if ($("#modal_perseonform_signedin").is(':checked')) { signedin = "1"; }
@@ -2402,9 +2426,10 @@ function moneyin_mod(transactionid) {
 				temptotal = parseFloat(temptotal) + parseFloat(itemval);
 			}
 		});
-		if (temptotal != parseFloat($("#modal_moneyin_totalpayment").val())) {
-			alert("Total of Allocation does not match total payment");
-		} else if ($("#modal_moneyin_description").val() == "") {
+		//if (temptotal != parseFloat($("#modal_moneyin_totalpayment").val())) {
+		//	alert("Total of Allocation does not match total payment");
+		//} else 
+		if ($("#modal_moneyin_description").val() == "") {
 			alert("No description given.");
 		} else if (temptotal == 0) {
 			alert("No amounts enterred");
@@ -2412,7 +2437,8 @@ function moneyin_mod(transactionid) {
 			var paymentid = transactionid;
 			var t = {"action":"modifymoneyin","params":{"id":paymentid}};
 			t["params"]["description"] = $("#modal_moneyin_description").val();
-			t["params"]["total"] = $("#modal_moneyin_totalpayment").val();
+			//t["params"]["total"] = $("#modal_moneyin_totalpayment").val();
+			t["params"]["total"] = temptotal;
 			var isvoucher = "0"; if ($("#model_moneyin_isvoucher").is(':checked')) { isvoucher = "1"; }
 			t["params"]["isvoucher"] = isvoucher;
 			t["params"]["voucheraffiliation"] = $("#modal_moneyin_voucheraffiliation").val();
@@ -2461,6 +2487,7 @@ var vouchers_asort = false;
 function vouchers_load() {
 	//vouchers_datatable
 	$("#vouchers_datatable").empty();
+	//try { console.log("Loading Vouchers"); } catch (e) {}
 	
 	var vhash = {};
 	var ahash = {};
@@ -2481,6 +2508,7 @@ function vouchers_load() {
 	var vcount = 0;
 	for (i in JSONDB.jsondb["moneyin"]) {
 		var m = JSONDB.jsondb["moneyin"][i];
+		//try { console.log("Voucher Checking",m); } catch (e) {}
 		if (m["isvoucher"] == "1") {
 			var a = JSONDB.jsondb["affiliation"][m["voucheraffiliation"]];
 			var balance = parsef(m["total"]) - parsef(vhash[m["id"]]);
@@ -2494,7 +2522,11 @@ function vouchers_load() {
 				var thistext= "";
 				if (aitem["type"] == "person") {
 					var p = JSONDB.jsondb["people"][aitem["refid"]];
-					thistext = p["firstname"]+" "+p["lastname"];
+					if ((typeof p != 'undefined')) {
+						thistext = p["firstname"]+" "+p["lastname"];
+					} else {
+						thistext = "**UNKNOWN** (Deleted?)";
+					}
 				} else if (aitem["type"] == "voucher") {
 					thistext = "Voucher: "+JSONDB.jsondb["moneyin"][aitem["refid"]]["description"];
 				} else {
