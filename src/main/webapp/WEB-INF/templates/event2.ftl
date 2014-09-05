@@ -350,6 +350,9 @@
 				<input type="button" value="    Add Money In    " onClick='moneyin_add();'/><input type="button" value="Refresh" onClick="moneyin_load();"/>
 				
 				<table id="finance_paymenttable"></table>
+				<hr/>
+				General Income Breakdown:<br/>
+				<table id="finance_paymenttable_general"></table>
 				
 				<div style="display:none" id="modal_moneyin">
 					Description of Payment (Type, Cheque #, Made-out-to, from): <input type="text" size="60" id="modal_moneyin_description"/><br/>

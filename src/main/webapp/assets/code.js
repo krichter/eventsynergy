@@ -2213,6 +2213,8 @@ function shop_sheet(groupareaid,groupid) {
 
 function moneyin_load() {
 	$("#finance_paymenttable").empty();
+	$("#finance_paymenttable_general").empty();
+	
 	for (i in JSONDB.jsondb["moneyin"]) {
 		var m = JSONDB.jsondb["moneyin"][i];
 		
@@ -2244,6 +2246,9 @@ function moneyin_load() {
 			$("#paymentrow_"+m["id"]+"_details").append("<tr>\n\
 				<td class='finance_paymentrow'>"+name+"</td>\n\
 				<td class='finance_paymentrow_amount currencycell'>"+fd(a["amount"])+"</td></tr>");
+			if (name == "<i>General Income</i>") {
+				$("#finance_paymenttable_general").append("<tr><td>"+m["description"]+"</td><td>"+fd(a["amount"])+"</td></tr>");
+			}
 		}
 	}
 }
