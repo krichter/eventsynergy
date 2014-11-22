@@ -3604,6 +3604,9 @@ function reports_load() {
 	$("#modal_createreport_left").append($("<option></option>").attr("value","c_paid").text("Total Paid"));
 	$("#modal_createreport_left").append($("<option></option>").attr("value","c_owing").text("Total Owing"));
 	$("#modal_createreport_left").append($("<option></option>").attr("value","c_shopspent").text("Total Shop Spent"));
+	$("#modal_createreport_left").append($("<option></option>").attr("value","c_transactions").text("Finance Transactions"));
+	$("#modal_createreport_left").append($("<option></option>").attr("value","c_transactionsin").text("Finance Transactions In"));
+	$("#modal_createreport_left").append($("<option></option>").attr("value","c_transactionsout").text("Finance Transactions Out"));
 
 	if (JSONDB.jsondb.hasOwnProperty("settings") && JSONDB.jsondb["settings"].hasOwnProperty("customordering")) {
 		for (var i in JSONDB.jsondb["settings"]["customordering"]) {
@@ -3754,6 +3757,7 @@ function reports_run() {
 			var balance = thiscost - thispaid;
 			
 			for (x in fieldlist) {
+				var valueishtml = false
 				var f = fieldlist[x];
 				var thevalue = "";
 				
@@ -3828,9 +3832,89 @@ function reports_run() {
 						} catch (e) {}
 						thevalue = fd(shopspent);
 						total_shopspent = total_shopspent+shopspent;
+					} else if (f["id"] == "transactions") {
+						valueishtml = true
+						thevalue = ""
+							
+						for (i in JSONDB.jsondb["groupareas"]["orderarray"]) {
+							var ga = JSONDB.jsondb["groupareas"][JSONDB.jsondb["groupareas"]["orderarray"][i]];
+							var selectedgroup = "Nothing Chosen";
+							var viewhtml = "";
+							var leaderhtml = "";
+							var thismodifier = 0.00;
+							
+							for (x in p["groupselection"]) {
+								if (x == ga["id"]) {
+									var gs = p["groupselection"][x];
+									if (ga["groups"].hasOwnProperty(gs["groupid"])) {
+										selectedgroup = ga["groups"][gs["groupid"]]["label"];
+										thismodifier = ga["groups"][gs["groupid"]]["modifier"];
+									}
+									break;
+								}
+							}
+							thevalue = thevalue + "Cost - "+ga["label"]+": "+selectedgroup+" - "+fd(thismodifier)+"<br/>";
+						}	
+							
+						if (settings_get("useshop") == "yes") {
+							thevalue = thevalue + "Cost - Shop Vouch - "+fd(parsef(p["shopvouch"]))+"<br/>";
+						}
+						// Money in
+						for (i in JSONDB.jsondb["moneyin"]) {
+							for (x in JSONDB.jsondb["moneyin"][i]["allocation"]) {
+								var desc = JSONDB.jsondb["moneyin"][i]["description"]
+								var alloc = JSONDB.jsondb["moneyin"][i]["allocation"][x];
+								if (alloc["type"] == "person" && alloc["refid"] == p["id"]) {
+									thevalue = thevalue + "In - "+desc+" - "+fd(parsef(alloc["amount"]))+"<br/>";
+								}
+							}
+						}
+					} else if (f["id"] == "transactionsin") {
+						valueishtml = true
+						thevalue = ""
+						// Money in
+						for (i in JSONDB.jsondb["moneyin"]) {
+							for (x in JSONDB.jsondb["moneyin"][i]["allocation"]) {
+								var desc = JSONDB.jsondb["moneyin"][i]["description"]
+								var alloc = JSONDB.jsondb["moneyin"][i]["allocation"][x];
+								if (alloc["type"] == "person" && alloc["refid"] == p["id"]) {
+									thevalue = thevalue + "In - "+desc+" - "+fd(parsef(alloc["amount"]))+"<br/>";
+								}
+							}
+						}
+					} else if (f["id"] == "transactionsout") {
+						valueishtml = true
+						thevalue = ""
+						for (i in JSONDB.jsondb["groupareas"]["orderarray"]) {
+							var ga = JSONDB.jsondb["groupareas"][JSONDB.jsondb["groupareas"]["orderarray"][i]];
+							var selectedgroup = "Nothing Chosen";
+							var viewhtml = "";
+							var leaderhtml = "";
+							var thismodifier = 0.00;
+							
+							for (x in p["groupselection"]) {
+								if (x == ga["id"]) {
+									var gs = p["groupselection"][x];
+									if (ga["groups"].hasOwnProperty(gs["groupid"])) {
+										selectedgroup = ga["groups"][gs["groupid"]]["label"];
+										thismodifier = ga["groups"][gs["groupid"]]["modifier"];
+									}
+									break;
+								}
+							}
+							thevalue = thevalue + "Cost - "+ga["label"]+": "+selectedgroup+" - "+fd(thismodifier)+"<br/>";
+						}							
+						if (settings_get("useshop") == "yes") {
+							thevalue = thevalue + "Cost - Shop Vouch - "+fd(parsef(p["shopvouch"]))+"<br/>";
+						}
 					}
 				}
-				therow.append($("<td></td>").text(thevalue))	
+				if (valueishtml) {
+					therow.append($("<td></td>").html(thevalue))
+				} else {
+					therow.append($("<td></td>").text(thevalue))
+				}
+						
 			}
 			target.append(therow);
 		}
