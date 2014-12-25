@@ -8,6 +8,8 @@ scalaVersion := "2.9.1"
 
 //seq(webSettings :_*)
 
+fork := true
+
 classpathTypes ~= (_ + "orbit")
 
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"

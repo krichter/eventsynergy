@@ -2891,11 +2891,12 @@ function spenders_print() {
 			<link rel="stylesheet" type="text/css" media="screen" href="/assets/tablesorter/style.css"/>\
 			<script src="/assets/jquery-1.7.1.min.js" type="text/javascript" charset="utf-8"></script>\
 			<script src="/assets/jquery.tablesorter.js" type="text/javascript" charset="utf-8"></script>\
-			</head><body id="everythingcontainer"><H1 id="reporttitle"></H1></body></html>');
-	$("#reporttitle",newwindow.document).text("Spenders");
-	$("title",newwindow.document).text("Spenders");
-	//$("body",newwindow.document).append("<div>Moo</div>");
-	$("#spendertable").clone().appendTo($("body",newwindow.document));
+			</head><body id="everythingcontainer"><h1 id="reporttitle"></h1></body></html>');
+	setTimeout(function(){
+		$("#reporttitle",newwindow.document).text("Spenders");
+		$("title",newwindow.document).text("Spenders");
+		$("#spendertable").clone().appendTo($("body",newwindow.document));
+	}, 2000);
 }
 
 function spenders_add() {
@@ -2951,11 +2952,12 @@ function budget_print() {
 			<link rel="stylesheet" type="text/css" media="screen" href="/assets/tablesorter/style.css"/>\
 			<script src="/assets/jquery-1.7.1.min.js" type="text/javascript" charset="utf-8"></script>\
 			<script src="/assets/jquery.tablesorter.js" type="text/javascript" charset="utf-8"></script>\
-			</head><body id="everythingcontainer"><H1 id="reporttitle"></H1></body></html>');
-	$("#reporttitle",newwindow.document).text("Budget vs Actual Expenses");
-	$("title",newwindow.document).text("Budget vs Actual Expenses");
-	//$("body",newwindow.document).append("<div>Moo</div>");
-	$("#finance_budgettable_head").clone().appendTo($("body",newwindow.document));
+			</head><body id="everythingcontainer"><h1 id="reporttitle"></h1></body></html>');
+	setTimeout(function(){
+		$("#reporttitle",newwindow.document).text("Budget vs Actual Expenses");
+		$("title",newwindow.document).text("Budget vs Actual Expenses");
+		$("#finance_budgettable_head").clone().appendTo($("body",newwindow.document));
+	}, 2000);
 }
 
 function budget_load() {
@@ -3853,10 +3855,12 @@ function reports_run() {
 									break;
 								}
 							}
-							thevalue = thevalue + "Cost - "+ga["label"]+": "+selectedgroup+" - "+fd(thismodifier)+"<br/>";
+							if (parsef(thismodifier).toFixed(2) != 0.00) {
+								thevalue = thevalue + "Cost - "+ga["label"]+": "+selectedgroup+" - "+fd(thismodifier)+"<br/>";
+							}
 						}	
 							
-						if (settings_get("useshop") == "yes") {
+						if (settings_get("useshop") == "yes" && parsef(p["shopvouch"]).toFixed(2) != 0.00) {
 							thevalue = thevalue + "Cost - Shop Vouch - "+fd(parsef(p["shopvouch"]))+"<br/>";
 						}
 						// Money in
@@ -3902,9 +3906,11 @@ function reports_run() {
 									break;
 								}
 							}
-							thevalue = thevalue + "Cost - "+ga["label"]+": "+selectedgroup+" - "+fd(thismodifier)+"<br/>";
+							if (parsef(thismodifier).toFixed(2) != 0.00) {
+								thevalue = thevalue + "Cost - "+ga["label"]+": "+selectedgroup+" - "+fd(thismodifier)+"<br/>";
+							}
 						}							
-						if (settings_get("useshop") == "yes") {
+						if (settings_get("useshop") == "yes" && parsef(p["shopvouch"]).toFixed(2) != 0.00) {
 							thevalue = thevalue + "Cost - Shop Vouch - "+fd(parsef(p["shopvouch"]))+"<br/>";
 						}
 					}
