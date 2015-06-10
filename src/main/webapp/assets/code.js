@@ -601,7 +601,7 @@ function people_view(id) {
 		for (x in persondata["groupselection"]) {
 			if (x == ga["id"]) {
 				var gs = persondata["groupselection"][x];
-				if (ga["groups"].hasOwnProperty(gs["groupid"])) {
+				if (ga.hasOwnProperty("groups") && ga["groups"].hasOwnProperty(gs["groupid"])) {
 					selectedgroup = ga["groups"][gs["groupid"]]["label"];
 					thismodifier = ga["groups"][gs["groupid"]]["modifier"];
 					if (gs["isleader"] == true) {
