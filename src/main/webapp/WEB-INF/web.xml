@@ -46,6 +46,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
         <web-resource-collection>
         	<web-resource-name>Management</web-resource-name>
             <url-pattern>/manage/*</url-pattern>
+            <url-pattern>/manage</url-pattern>
             <url-pattern>/jsondb/*</url-pattern>
             <url-pattern>/manageapp/*</url-pattern>
         </web-resource-collection>

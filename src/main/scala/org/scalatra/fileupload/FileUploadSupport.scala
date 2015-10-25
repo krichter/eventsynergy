@@ -1,7 +1,6 @@
 package org.scalatra
 package fileupload
 
-//import scala.language.postfixOps
 import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.fileupload.{FileItemFactory, FileItemStream}
 import collection.JavaConversions._
@@ -14,6 +13,7 @@ import collection.Iterable
 import java.lang.String
 import scala.io._;
 import java.io._;
+import scala.language.postfixOps
 
 /**
  * This is a tweaked version of the one that can come with Scalatra. This allows for it to work on Google App Engine
@@ -27,7 +27,7 @@ import java.io._;
    *
    * @note Once any handler with FileUploadSupport has accessed the request, the fileParams returned by FileUploadSupport will remain fixed for
    * the lifetime of the request. */
-trait FileUploadSupport extends ScalatraKernel {
+trait FileUploadSupport extends ScalatraKernel  {
 	import FileUploadSupport._
 
 	override def handle(req: HttpServletRequest, resp: HttpServletResponse) {

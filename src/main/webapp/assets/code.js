@@ -535,11 +535,75 @@ function people_processmod(personid) {
 	JSONDB.dotransaction(t);
 }
 
+function people_print(id) {
+	console.log("Trying to print",id);
+	var persondata = JSONDB.jsondb["people"][id];
+	var newwindow = window.open('','_blank','status=1,toolbar=1,location=1,menubar=1,statusbar=1');
+	newwindow.document.write("<html><head><title></title></head><body class='bigger'></body></html>");
+	$("head",newwindow.document).append('<link rel="stylesheet" type="text/css" href="/assets/printable.css"/>');
+	
+	$("body",newwindow.document).append("<span class='field_label'>Firstname:</span> "+persondata["firstname"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Lastname:</span> "+persondata["lastname"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Home Phone #:</span> "+persondata["homephone"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Mobile Phone #:</span> "+persondata["mobilephone"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Email:</span> "+persondata["email"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Parent's Name:</span> "+persondata["parents_name"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Parent's Phone:</span> "+persondata["parents_phone"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Emergency Contact Information:</span> "+persondata["emergencyinfo"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Care Card:</span> "+persondata["carecard"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Birthdate:</span> "+persondata["birthdate"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Age:</span> "+getage(parsedate(persondata["birthdate"]))+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Gender:</span> "+persondata["gender"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Address: Street:</span> "+persondata["address_street"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Address: City:</span> "+persondata["address_city"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Address: Postal Code:</span> "+persondata["address_postal"]+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Affiliation:</span> "+report_getaffiliationname(persondata["affiliation"])+"<br/>");
+	$("body",newwindow.document).append("<span class='field_label'>Comments:</span><br/><div>"+nl2br(safeforhtml(persondata["comments"]))+"</div><br/>");
+	
+	if (JSONDB.jsondb.hasOwnProperty("settings") && JSONDB.jsondb["settings"].hasOwnProperty("customordering")) {
+		for (var i in JSONDB.jsondb["settings"]["customordering"]) {
+			var cfield = JSONDB.jsondb["settings"]["customfields"][JSONDB.jsondb["settings"]["customordering"][i]];
+			var thevalue = "";
+			try {
+				thevalue = persondata["customfields"][cfield["id"]];
+			} catch (e) {}
+			
+			$("body",newwindow.document).append("<span class='field_label'>"+cfield["fieldname"]+":</span> "+thevalue+"<br/>");
+		}
+	}	
+	$("body",newwindow.document).append("<br/>");
+	
+	for (i in JSONDB.jsondb["groupareas"]["orderarray"]) {
+		var ga = JSONDB.jsondb["groupareas"][JSONDB.jsondb["groupareas"]["orderarray"][i]];
+		var selectedgroup = "Nothing Chosen";
+		var viewhtml = "";
+		var leaderhtml = "";
+		var thismodifier = 0.00;
+		
+		for (x in persondata["groupselection"]) {
+			if (x == ga["id"]) {
+				var gs = persondata["groupselection"][x];
+				if (ga.hasOwnProperty("groups") && ga["groups"].hasOwnProperty(gs["groupid"])) {
+					selectedgroup = ga["groups"][gs["groupid"]]["label"];
+					thismodifier = ga["groups"][gs["groupid"]]["modifier"];
+					if (gs["isleader"] == true) {
+						leaderhtml = " (Leader)";
+					}
+					viewhtml = " <input type='button' value='View' onClick='closecheck(\"groups_view(\\\""+ga["id"]+"\\\",\\\""+gs["groupid"]+"\\\")\");'/>";
+				}
+				break;
+			}
+		}
+		
+		$("body",newwindow.document).append("<span class='field_label'>"+ga["label"]+":</span> "+selectedgroup+leaderhtml+"<br/>");
+	}	
+}
+
 function people_view(id) {
 	var persondata = JSONDB.jsondb["people"][id];
 	$("#modal_person").modal({containerCss: {width:"95%",height:"90%"}});
-	$("#modal_person_reportbutton").click(function() {
-		//report_person(persondata["rowid"]);
+	$("#modal_person_printbutton").click(function() {
+		people_print(id);
 	});
 	$("#modal_person_removebutton").click(function() {
 		closecheck("people_delete(\""+persondata["id"]+"\");");

@@ -39,6 +39,14 @@ body {
 	margin: 0px;
 }
 
+.bigger {
+	font-size: 10pt;
+}
+
+.field_label {
+	font-weight: bold;
+}
+
 #pointstable,#spendsheettable,#finance_paymenttable,table.finance_peopletable,table.finance_paymentdetails,#finance_spendertable,table.finance_spenderdetail,table.finance_budgettable,table.finance_budget_expectedincome,table.budget_subtable {
 	width: 100%;	
 }

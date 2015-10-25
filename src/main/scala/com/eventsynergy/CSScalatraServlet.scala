@@ -1,7 +1,7 @@
 package com.eventsynergy
 
 import java.net.URL
-import java.util.{UUID,Date,TimeZone,Properties}
+import java.util.{UUID,Date,TimeZone,Properties,Calendar}
 import java.text.{SimpleDateFormat,NumberFormat}
 import collection.JavaConversions._;
 import org.scalatra.{ScalatraFilter,ScalatraServlet};
@@ -13,7 +13,8 @@ import org.scalatra.fileupload.FileUploadSupport
 import javax.mail._;
 import javax.mail.internet._;
 import java.util.logging.Logger;
-//import scala.language.implicitConversions;
+import scala.language.postfixOps
+import scala.language.implicitConversions;
 
 import freemarker.template._;
 
@@ -187,7 +188,14 @@ class CSScalatraServlet extends ScalatraServlet with FileUploadSupport {
 					e.printStackTrace()
 				}
 			}
+		} catch {
+		  case e:Throwable => {
+		    //noop
+		  }
 		}
+		
+		val this_year = Calendar.getInstance().get(Calendar.YEAR);
+		var available_years = (1900 to this_year)
 		
 		var m = new java.util.HashMap[String,Any]();
 		m.put("isallowed",isallowed)
@@ -197,6 +205,7 @@ class CSScalatraServlet extends ScalatraServlet with FileUploadSupport {
 		m.put("affiliationgroups",affiliationgroups.toArray)
 		m.put("groupmap",groupareas.toArray)
 		m.put("customfields",customfields.toArray)
+		m.put("available_years",available_years.toArray.reverse)
 		templatecfg.setServletContextForTemplateLoading(servletContext,"WEB-INF/templates")
 		var t = templatecfg.getTemplate("register.ftl")
 		t.process(m,response.getWriter)
@@ -388,7 +397,7 @@ class CSScalatraServlet extends ScalatraServlet with FileUploadSupport {
 			} catch {
 				case e:Throwable => {
 					picturefileid = "";
-					log.severe(e.getStackTraceString)
+					printerror(e)
 				}
 			}
 			try {
@@ -439,6 +448,10 @@ class CSScalatraServlet extends ScalatraServlet with FileUploadSupport {
 							groupsummary += grouparealabel+" Choice: "+grouplabel+": "+modifier+" ("+Utils.dollerfy(modifier)+")\n";
 							try {
 								totalcost = totalcost + modifier.toFloat
+							} catch {
+							  case e:Throwable => {
+							    // noop
+							  }
 							}
 						}
 					})
@@ -473,7 +486,7 @@ class CSScalatraServlet extends ScalatraServlet with FileUploadSupport {
 			try {
 				totalcost = totalcost + shopamount.toDouble;
 			} catch {
-				case e:Throwable => log.severe(e.getStackTraceString)
+				case e:Throwable => printerror(e)
 			}
 		}
 		
@@ -706,7 +719,7 @@ class CSScalatraServlet extends ScalatraServlet with FileUploadSupport {
 	// ----------------------------------------------------------------------------------------------
 	
 	def printerror(e:Throwable) {
-		log.severe(e.getMessage+"\n"+e.getStackTraceString)
+	  Utils.printerror(e)
 	}
 }
  

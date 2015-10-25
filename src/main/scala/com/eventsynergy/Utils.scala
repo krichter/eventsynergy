@@ -1,8 +1,5 @@
 package com.eventsynergy
 
-//import scala.language.implicitConversions;
-//import scala.language.postfixOps
-
 import java.net.URL
 import java.util.{UUID,Date,TimeZone,Properties}
 import java.text.{SimpleDateFormat,NumberFormat}
@@ -19,6 +16,10 @@ import java.util.logging.Logger;
 import java.io.{ByteArrayInputStream,ByteArrayOutputStream}
 import java.util.zip._
 import scala.io.Source
+import scala.language.postfixOps
+import scala.language.implicitConversions
+
+import org.apache.commons.lang3.exception.ExceptionUtils
 
 //import freemarker.template._;
 
@@ -45,7 +46,7 @@ object Utils {
 	case class JSONDBTransaction(id:Int,who:String,json:String,datestamp:Date,containsbackup:Boolean,entity:Entity)
 	
 	def printerror(e:Throwable) {
-		log.severe(e.getMessage+"\n"+e.getStackTraceString)
+		log.severe(e.getMessage+"\n"+ExceptionUtils.getStackTrace(e))
 	}
 	
 	def userallowed(emailaddress:String):Boolean = {
@@ -161,13 +162,13 @@ object Utils {
 	}
 	
 	def containsnull(theval:String):Boolean = {
-		return theval.indexOf('\0') > -1;
+		return theval.indexOf('\u0000') > -1;
 	}
 	
 	def stripnulls(theval:String):String = {
 		var n = new String();
 		theval.foreach(char => {
-			if (char != '\0') {
+			if (char != '\u0000') {
 				n = n + char;	
 			}
 		});
@@ -375,6 +376,10 @@ object Utils {
 			for (i <- newchunkcount.until(oldcount+1)) {
 				try {
 					e.removeProperty("jsondb_chunk_"+i);
+				} catch {
+				  case e:Throwable => {
+				    // noop
+				  }
 				}
 			}
 		}
@@ -407,6 +412,10 @@ object Utils {
 		var tid:Long = startval-1;
 		try {
 			tid = e.getProperty("tid").asInstanceOf[Long];
+		} catch {
+		  case e:Throwable => {
+		    //noop
+		  }
 		}
 		if (tid == 0) {
 			tid = startval-1;

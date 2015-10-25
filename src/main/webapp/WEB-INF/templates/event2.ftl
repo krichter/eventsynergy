@@ -663,7 +663,7 @@
 				<div style="clear:both;width:100%;"></div>
 			</div>
 			
-			<input type="button" id="modal_person_modbutton" value="  Modify  "/> <input class='contact-cancel contact-button simplemodal-close' type='button' value='  Close  '/> <input type="button" id="modal_person_reportbutton" value="  Report  "/>
+			<input type="button" id="modal_person_modbutton" value="  Modify  "/> <input class='contact-cancel contact-button simplemodal-close' type='button' value='  Close  '/> <input type="button" id="modal_person_printbutton" value="  Print  "/>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" id="modal_person_removebutton" value="Unregister (Remove from event)"/>
 		</div>
 		<div style="display:none" id="modal_areyousure">

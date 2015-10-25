@@ -15,7 +15,7 @@ import org.scalatra.fileupload.FileUploadSupport
 import java.util.logging.Logger;
 import java.text.DateFormat;
 import java.util.Date;
-//import scala.language.implicitConversions;
+import scala.language.implicitConversions
 
 import freemarker.template._;
 
@@ -477,7 +477,7 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 	/**
 	 * Handling the template with the primary management list
 	 */
-	get("/manage/") {
+	get("/manage/?") {
 		var userlist = new ListBuffer[String]();
 		var eventlist = new ListBuffer[Event]();
 		
@@ -503,9 +503,9 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 		t.process(m,response.getWriter)
 	}
 	
-	get("/manage") {
-		redirect("/manage/");
-	}
+//	get("/manage") {
+//		redirect("/manage/");
+//	}
 		
 	get("/manage/*") {
 		println("/manage/ Access: "+userService.getCurrentUser().getEmail())
@@ -779,7 +779,7 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 	 * Simple function for handling logging
 	 */
 	def printerror(e:Throwable) {
-		log.severe(e.getMessage+"\n"+e.getStackTraceString)
+	  Utils.printerror(e)
 	}
 }
  
