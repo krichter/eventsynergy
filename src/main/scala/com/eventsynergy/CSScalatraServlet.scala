@@ -242,6 +242,9 @@ class CSScalatraServlet extends ScalatraServlet with FileUploadSupport {
 		
 		var ekey = KeyFactory.createKey("event",eventid);
 		var e = datastore.get(ekey);
+  	var queue = QueueFactory.getDefaultQueue();
+		queue.add(withUrl("/jsondb/consolidate").param("dbid",eventid))
+
 		e.setProperty("onlinestatus",status)
 		datastore.put(e);
 		"Event status is now: "+status

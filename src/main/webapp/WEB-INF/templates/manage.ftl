@@ -9,7 +9,7 @@
 <body>
 	<div id="outerbox"><div id="contentbox">
 	<center><h1>Event Management</h1></center>
-	<form action="createevent" method="POST">
+	<form action="/manage/createevent" method="POST">
 		Title: <input type="text" size="15" name="title"/> <input type="submit" value="Create New Event"/>
 	</form><br/>
 	<table border='1' width="100%">
@@ -39,7 +39,7 @@
 	</table>
 	<hr/>
 	<h2>User List</h2>
-	<form action="adduser" method="POST">
+	<form action="/manage/adduser" method="POST">
 		Google Email: <input type="text" size="15" name="email"/> <input type="submit" value="Add to allowed list"/>
 	</form><br/>
 	<table border='1'>
@@ -63,10 +63,29 @@
 		<input type='hidden' name='schemajson' id='backupform_schemajson'/>
 	</form>
 	<br/><br/>
-	<hr/>
-	<form action='/manage/translatebackup' method='POST'  enctype="multipart/form-data">
-		Version 1 Backup File: <input type='file' name='dbfile'> <input type="submit" value="Translate"/>
+	<h2>Affiliate Access List</h2>
+	<form action="/manage/addaffiliateuser" method="POST">
+		Google Email: <input type="text" size="15" name="email"/>  Affiliate: <input type="text" size="15" name="affiliation"> <input type="submit" value="Add to allowed list"/>
 	</form>
+	<br/>
+	<table border='1'>
+	<thead>
+		<tr>
+			<th>Email</th>
+			<th>Affiliation</th>
+			<th>Operation</th>
+		</tr>
+	</thead>
+	<tbody id='table_affiliationuserlist'>
+		<#list affiliateuserlist as user>
+			<tr>
+				<td class='userlist_email'>${user.email()}</td>
+				<td class='userlist_affiliation'>${user.affiliation()}</td>
+				<td><a href='/manage/removeaffiliateuser?email=${user.email()}'>Remove</a></td>
+			</tr>
+		</#list>
+	</tbody>
+	</table>	
 	</div></div>
 </body>
 </html>

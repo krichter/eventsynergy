@@ -34,24 +34,24 @@ import org.mozilla.javascript._;
  * This in a class built on the Scalatra framework
  */
 class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
-	var log = Logger.getLogger(this.getClass.getName());
-	var userService = UserServiceFactory.getUserService();
+	val log = Logger.getLogger(this.getClass.getName());
+	val userService = UserServiceFactory.getUserService();
 	//var datastore = DatastoreServiceFactory.getDatastoreService();
-	var memcacheservice = MemcacheServiceFactory.getMemcacheService();
-	var channelService = ChannelServiceFactory.getChannelService();
+	val memcacheservice = MemcacheServiceFactory.getMemcacheService();
+	val channelService = ChannelServiceFactory.getChannelService();
 	implicit def object2PropertyValue(o: Object):PropertyValue = new PropertyValue(o);
 	implicit def entity2CustomEntity(e: Entity):CustomEntity = new CustomEntity(e);
 	case class Event(id:String,title:String);
-	
+	case class AffiliateUser(email:String,affiliation:String)
 
 	// Freemarker template handling setup
-	var templatecfg = new Configuration();
+	val templatecfg = new Configuration();
 		
 	// Set some defaults
 	val presencetimeout = 300;
 	val backupjsondbeveryxtransactions = 25;
 	val transactionlistbatch = 100;
-	
+
 	/**
 	 * GET call to forward the javascript transactions document through to client browser.
 	 * 
@@ -90,6 +90,19 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 		redirect("/manage/");
 	}
 	
+	post("/manage/addaffiliateuser") {
+	  var param_email = params.get("email").getOrElse(null);
+	  var param_affiliate = params.get("affiliation").getOrElse(null)
+		if (param_email != null && param_affiliate != null) {
+			var datastore = DatastoreServiceFactory.getDatastoreService()
+			var e = new Entity("affiliateuser",param_email.toLowerCase());
+			e.setProperty("email",param_email.toLowerCase())
+			e.setProperty("affiliation",param_affiliate)
+			datastore.put(e);
+		}
+	  redirect("/manage/");
+	}
+	
 	/**
 	 * POST call to add user to allowed users list.
 	 */
@@ -121,7 +134,19 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 		}
 		redirect("/manage/");
 	}
-	
+
+		get("/manage/removeaffiliateuser") {
+		var param_email = params.get("email").getOrElse(null);
+		var datastore = DatastoreServiceFactory.getDatastoreService();
+		try {
+			datastore.delete(KeyFactory.createKey("affiliateuser",param_email))
+		} catch {
+			case e:Throwable => printerror(e)
+		}
+		memcacheservice.delete("affiliateaccess_"+param_email)
+		redirect("/manage/");
+	}
+
 	/**
 	 * Launch point for an application instance.
 	 * 
@@ -175,6 +200,9 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 				m.put("channeltoken",channeltoken);
 				m.put("eventid",eventid);
 				m.put("clientid",clientid);
+				m.put("affiliate_mode",false);
+				m.put("affiliation","");
+				m.put("myemail",userService.getCurrentUser().getEmail().toLowerCase());
 				templatecfg.setServletContextForTemplateLoading(servletContext,"WEB-INF/templates")
 				var t = templatecfg.getTemplate("event2.ftl")
 				t.process(m,response.getWriter)
@@ -474,11 +502,165 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 		newjson
 	}
 	
+	get("/affiliate/?") {
+	  var datastore = DatastoreServiceFactory.getDatastoreService();
+	  var eventlist = new ListBuffer[Event]();
+
+	  var q2 = new Query("event")
+		q2.addSort("title",Query.SortDirection.ASCENDING)
+		datastore.prepare(q2).asList(FetchOptions.Builder.withDefaults).foreach(r => {
+			eventlist += Event(r.getProperty("id").toString,r.getProperty("title").toString)
+		})
+			
+	  var m = new java.util.HashMap[String,Any]();
+		m.put("eventlist",eventlist.toArray)
+		templatecfg.setServletContextForTemplateLoading(servletContext,"WEB-INF/templates")
+		var t = templatecfg.getTemplate("affiliate.ftl")
+		t.process(m,response.getWriter)
+  }
+	
+	get("/affiliate/event") {
+		var eventid = params.get("id").getOrElse(null);
+		if (!Utils.eventidExists(eventid)) {
+			halt(404);
+		}
+		try {
+			if (memcacheservice.get("restoreinprogress_"+eventid) != null) {
+				"This event is currently not available due to DB restore in progress..."
+			} else {
+				
+				var ekey = KeyFactory.createKey("event",eventid);
+				var datastore = DatastoreServiceFactory.getDatastoreService();
+				var e = datastore.get(ekey);
+				
+				// ----------------------------------------------------------------------------------------------
+				// Start of channel support code.
+				//
+				// Logic based on pinging a known spot in the memcache service. If it times out, you are now offline
+				// Sets up unique channel for this manage instance
+				// Keeps a list of "live" clients in memcached for an event that will want to get updates
+				// ----------------------------------------------------------------------------------------------
+				var clientid = Utils.getUUID()
+				memcacheservice.put(eventid+"_"+clientid,1,Expiration.byDeltaSeconds(presencetimeout))
+				
+				var lockresult = Utils.getLockOrWait(eventid+"_channelreg")
+				var regresult = memcacheservice.get(eventid+"_reg")
+				var toput = "";
+				if (regresult == null) {
+					toput = clientid
+				} else {
+					toput = regresult+","+clientid
+				}
+				memcacheservice.put(eventid+"_reg",toput);
+				if (lockresult == 1) {
+					Utils.releaseLock(eventid+"_channelreg")
+				}
+				
+				var channeltoken = channelService.createChannel(clientid);
+
+				// Freemarker template processing
+				var m = new java.util.HashMap[String,Any]();
+				m.put("channeltoken",channeltoken);
+				m.put("eventid",eventid);
+				m.put("affiliation",Utils.affiliateallowed(userService.getCurrentUser().getEmail().toLowerCase()))
+				m.put("affiliate_mode",true);
+				m.put("clientid",clientid);
+				m.put("myemail",userService.getCurrentUser().getEmail().toLowerCase());
+				templatecfg.setServletContextForTemplateLoading(servletContext,"WEB-INF/templates")
+				var t = templatecfg.getTemplate("event2.ftl")
+				t.process(m,response.getWriter)
+			}
+		} catch {
+			// Probably will never be seen due to eventid check earlier
+			case error:com.google.appengine.api.datastore.EntityNotFoundException => {
+				// Event object wasn't found, redirect out	
+				redirect("/manage/");
+			}
+			case e2:Throwable => {
+				printerror(e2)
+				halt();
+			}
+		}
+		/*
+		} else {
+			redirect("/manage/");
+		}*/
+	}
+	/*
+	get("/affiliate/vouchers") {
+	  var eventid = params.getOrElse("eventid",null)
+		if (!Utils.eventidExists(eventid)) {
+			halt(404);
+		}
+	  var datastore = DatastoreServiceFactory.getDatastoreService();
+	  val affiliation = Utils.affiliateallowed(userService.getCurrentUser().getEmail().toLowerCase());
+	  
+	  val e = datastore.get(KeyFactory.createKey("event",eventid));
+		var event_title = e.getPropertyAsString("title")
+		
+		val jsondb = Utils.getdb(eventid)._1
+		val parseddb = JSON.parseFull(jsondb)
+		val db:scala.collection.immutable.Map[String,Any] = parseddb.getOrElse(null).asInstanceOf[scala.collection.immutable.Map[String,Any]];
+		
+		var affiliation_id:String = null
+		try {
+		  db("affiliation").asInstanceOf[scala.collection.immutable.Map[String,Any]].foreach(item => {
+		    if (item._2.asInstanceOf[scala.collection.immutable.Map[String,String]].getOrElse("groupname", "").toLowerCase() == affiliation.toLowerCase()) {
+		      affiliation_id = item._1
+		    }
+			})
+		} catch { 
+		  case e:Exception => printerror(e); 
+		}
+		
+		case class VoucherAllocation(target:String,target_id:String,amount:Double)
+		case class Voucher(label:String,totalAmount:Double,distribution:List[VoucherAllocation])
+		
+		val voucherlist = new ListBuffer[Voucher]();
+		try {
+		  db("moneyin").asInstanceOf[scala.collection.immutable.Map[String,Any]].foreach(item => {
+		    val moneyin_data = item._2.asInstanceOf[scala.collection.immutable.Map[String,Any]]
+		    if (moneyin_data.getOrElse("voucheraffiliation", "").asInstanceOf[String] == affiliation_id && moneyin_data.getOrElse("isvoucher", "0").asInstanceOf[String] == "1") {
+		      val description = moneyin_data.getOrElse("description", "").asInstanceOf[String]
+		      val total = moneyin_data.getOrElse("total", "").asInstanceOf[Double]
+		      val allocations = new ListBuffer[VoucherAllocation]
+		      moneyin_data.get("allocation").get.asInstanceOf[List[scala.collection.immutable.Map[String,Any]]].foreach(a => {
+		        val amount = a.getOrElse("amount", 0.0).asInstanceOf[Double]
+		        val allocation_type = a.getOrElse("type", "").asInstanceOf[String]
+		        val refid = a.getOrElse("refid", "").asInstanceOf[String]
+		        
+		        allocations += VoucherAllocation("",refid,amount)
+		      })
+		      voucherlist += Voucher(description,total,allocations.toList)
+		    }
+			})
+		} catch {
+		  case e:Exception => printerror(e);
+		}
+		
+		println(eventid)
+		println(event_title)
+		println(affiliation)
+		println(affiliation_id)
+		println(voucherlist)
+		
+	  
+	  var m = new java.util.HashMap[String,Any]();
+		m.put("eventid",eventid)
+		m.put("event_title",event_title)
+		m.put("affiliation",affiliation)
+		m.put("affiliation_id",affiliation_id)
+		templatecfg.setServletContextForTemplateLoading(servletContext,"WEB-INF/templates")
+		var t = templatecfg.getTemplate("vouchers.ftl")
+		t.process(m,response.getWriter)
+	}*/
+	
 	/**
 	 * Handling the template with the primary management list
 	 */
 	get("/manage/?") {
 		var userlist = new ListBuffer[String]();
+		var affiliateuserlist = new ListBuffer[AffiliateUser]();
 		var eventlist = new ListBuffer[Event]();
 		
 		var q = new Query("alloweduser")
@@ -487,7 +669,15 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 		datastore.prepare(q).asList(FetchOptions.Builder.withDefaults).foreach(r => {
 			userlist += r.getProperty("email").toString
 		})
-		
+
+		var q3 = new Query("affiliateuser")
+		q.addSort("email",Query.SortDirection.ASCENDING)
+		datastore = DatastoreServiceFactory.getDatastoreService();
+		datastore.prepare(q3).asList(FetchOptions.Builder.withDefaults).foreach(r => {
+		  var affiliates = r.getProperties.filterKeys( k => k.startsWith("affiliation")).map(p => p._2.asInstanceOf[String]).toList
+			affiliateuserlist += AffiliateUser(r.getProperty("email").toString,r.getProperty("affiliation").toString)
+		})
+
 		var q2 = new Query("event")
 		q2.addSort("title",Query.SortDirection.ASCENDING)
 		datastore.prepare(q2).asList(FetchOptions.Builder.withDefaults).foreach(r => {
@@ -498,33 +688,38 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 		//m.put("bloburl",blobstoreService.createUploadUrl("/db/restore"))
 		m.put("userlist",userlist.toArray)
 		m.put("eventlist",eventlist.toArray)
+		m.put("affiliateuserlist",affiliateuserlist.toArray)
 		templatecfg.setServletContextForTemplateLoading(servletContext,"WEB-INF/templates")
 		var t = templatecfg.getTemplate("manage.ftl")
 		t.process(m,response.getWriter)
 	}
-	
-//	get("/manage") {
-//		redirect("/manage/");
-//	}
-		
-	get("/manage/*") {
+
+	get("/affiliate*") {
+		println("/affiliate Access: "+userService.getCurrentUser().getEmail())
+		if (Utils.affiliateallowed(userService.getCurrentUser().getEmail().toLowerCase()) != null) {
+			pass();
+		} else {
+			halt(403,userService.getCurrentUser().getEmail()+" is not authorized. Contact Administrator");
+		}
+	}
+
+	get("/manage*") {
 		println("/manage/ Access: "+userService.getCurrentUser().getEmail())
 		if (Utils.userallowed(userService.getCurrentUser().getEmail().toLowerCase())) {
 			pass();
 		} else {
-			halt(403,userService.getCurrentUser().getEmail());
+			halt(403,userService.getCurrentUser().getEmail()+" is not authorized. Contact Administrator");
 		}
 	}
 	
-	post("/manage/*") {
+	post("/manage*") {
 		println("/manage/ Access: "+userService.getCurrentUser().getEmail())
 		if (Utils.userallowed(userService.getCurrentUser().getEmail().toLowerCase())) {
 			pass();
 		} else {
-			halt(403,userService.getCurrentUser().getEmail());
+			halt(403,userService.getCurrentUser().getEmail()+" is not authorized. Contact Administrator");
 		}
-	}
-	
+	}	
 	
 	get("/jsondb/image") {
 		var imageid = params.getOrElse("imageid",null)

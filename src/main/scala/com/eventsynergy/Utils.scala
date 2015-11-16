@@ -49,6 +49,29 @@ object Utils {
 		log.severe(e.getMessage+"\n"+ExceptionUtils.getStackTrace(e))
 	}
 	
+	def affiliateallowed(emailaddress:String):String = {
+	  var testcache = memcacheservice.get("affiliateaccess_"+emailaddress)
+		if (testcache != null) {
+			//println("Direct Access cache hit, access granted");
+			return testcache.asInstanceOf[String];
+		} else {
+			// Cache miss, check DB
+			var datastore = DatastoreServiceFactory.getDatastoreService();
+			try {
+				//println("Access cache miss");
+				
+				val record = datastore.get(KeyFactory.createKey("affiliateuser",emailaddress))
+				val affiliation = record.getProperty("affiliation").asInstanceOf[String]
+				memcacheservice.put("affiliateaccess_"+emailaddress,affiliation)
+				//println("Access granted");
+				return affiliation;
+			} catch {
+				case e:Throwable => { }
+			}
+		}
+		return null;
+	}
+	
 	def userallowed(emailaddress:String):Boolean = {
 		var testcache = memcacheservice.get("access_"+emailaddress)
 		if (testcache != null) {

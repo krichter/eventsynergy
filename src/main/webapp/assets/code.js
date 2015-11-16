@@ -9,10 +9,12 @@ jQuery(document).ready(function() {
 				}; }
 			});
 		}
+		
 		JSONDB.init(c,master_eventid,master_channeltoken,master_clientid);
+
 		$("#people_datalist_master").tablesorter({
 			headers: {
-				4: { sorter: false}
+				5: { sorter: false}
 			}
 		});
 		$("#unpeople_datalist_master").tablesorter({
@@ -42,6 +44,9 @@ jQuery(document).ready(function() {
 		});
 		$("#vouchers_vouchertable").tablesorter();
 		$("#vouchers_affiliationsummary").tablesorter();
+		$("#affiliate_registration_table").tablesorter();
+		$("#affiliate_voucher_table").tablesorter();
+		$("#affiliate_finance_table").tablesorter();
 		$("#registration-accordion").accordion({
 			collapsible: true
 		});
@@ -95,6 +100,15 @@ function reacttoshow(tab) {
 	}
 	if (tab == "tab-reports") {
 		reports_load();
+	}
+	if (tab == "tab-affiliate-registration") {
+		affiliate_registrations_load();
+	}
+	if (tab == "tab-affiliate-vouchers") {
+		affiliate_vouchers_load();
+	}
+	if (tab == "tab-affiliate-finance") {
+		affiliate_finance_load();
 	}
 }
 
@@ -252,6 +266,27 @@ function getsortedaffiliations() {
 		$(button).parents("tr").next().css("display","");
 	}
 }*/
+
+function affiliate_switchapproval(button) {
+	var sivalue = $(button).parents("td").children(".sivalue").text();
+	var personid = $(button).parents("tr").attr("personid");
+	var t = {"action":"modperson","params":{"id":personid}};
+	t["params"]["approval_author"] = myemail;
+	if (sivalue == "Yes") {
+		t["params"]["approval"] = "0";
+		$(button).parents("td").children(".sivalue").text("No");
+	} else {
+		t["params"]["approval"] = "1";
+		$(button).parents("td").children(".sivalue").text("Yes");
+	}
+	JSONDB.dotransaction(t);
+}
+
+function affiliate_approval_comment(button,ref) {
+	var personid = $(button).parents("tr").attr("personid");
+	approval_comment_set(personid,button);
+}
+
 function people_switchsignedin(button) {
 	var sivalue = $(button).parents("td").children(".sivalue").text();
 	var personid = $(button).parents("tr").attr("personid");
@@ -282,6 +317,7 @@ function people_load() {
 			<td class='lastname'></td>\n\
 			<td class='affiliation'></td>\n\
 			<td class='signedin'></td>\n\
+			<td class='approval'></td>\n\
 			<td class='centerit'><input type='button' value='View' onClick='people_processrowaction(this,\"view\");'/></td>\n\
 			<td class='centerit'><input type='button' value='Mod' onClick='people_processrowaction(this,\"mod\");'/></td>\n\
 			<td class='centerit'><input type='button' value='Remove' onClick='people_processrowaction(this,\"delete\");'/></td>\n\
@@ -295,6 +331,12 @@ function people_load() {
 			row.children(".signedin").html("<span class='sivalue'>Yes</span> (<a href='#' onClick='return people_switchsignedin(this);'>Switch</a>)");
 		} else {
 			row.children(".signedin").html("<span class='sivalue'>No</span> (<a href='#' onClick='return people_switchsignedin(this);'>Switch</a>)");
+		}
+		
+		if (person["approval"] == "1") {
+			row.children(".approval").text("Yes");
+		} else {
+			row.children(".approval").text("No");
 		}
 		
 		$("#people_datalist").append(row);
@@ -437,12 +479,18 @@ function people_mod(personid) {
 	$("#modal_personform_address_city").val(p["address_city"]);
 	$("#modal_personform_address_postal").val(p["address_postal"]);
 	$("#modal_personform_comments").val(p["comments"]);
+	$("#modal_personform_approval_comment").val(p["approval_comment"]);
+	$("#modal_personform_approval_author").val(p["approval_author"]);
 	showimage($("#modal_personform_image"),p["picturefileid"],"small",true);
 	
 	$("#modal_personform_affiliation option[value='"+p["affiliation"]+"']").attr('selected', 'selected');
 
 	if (p["signedin"] == "1") {
-		$('#modal_perseonform_signedin').attr('checked',true);
+		$('#modal_personform_signedin').attr('checked',true);
+	}
+	
+	if (p["approval"] == "1") {
+		$('#modal_personform_approval').attr('checked',true);
 	}
 	
 	try {
@@ -499,9 +547,16 @@ function people_processmod(personid) {
 	if (p["affiliation"] != $("#modal_personform_affiliation").val()) { t["params"]["affiliation"] = $("#modal_personform_affiliation").val(); }
 	if (p["picturefileid"] != $("#modal_personform_image").attr("picturefileid")) { t["params"]["picturefileid"] = $("#modal_personform_image").attr("picturefileid"); }
 	
-	var signedin = "0"; if ($("#modal_perseonform_signedin").is(':checked')) { signedin = "1"; }
+	var signedin = "0"; if ($("#modal_personform_signedin").is(':checked')) { signedin = "1"; }
 	if (p["signedin"] != signedin) {
 		t["params"]["signedin"] = signedin;	
+	}
+	
+	if (p["approval_comment"] != $("#modal_personform_approval_comment").val()) { t["params"]["approval_comment"] = $("#modal_personform_approval_comment").val(); }
+	if (p["approval_author"] != $("#modal_personform_approval_author").val()) { t["params"]["approval_author"] = $("#modal_personform_approval_author").val(); }
+	var approval = "0"; if ($("#modal_personform_approval").is(':checked')) { approval = "1"; }
+	if (p["approval"] != approval) {
+		t["params"]["approval"] = approval;
 	}
 	
 	t["params"]["customfields"] = {};
@@ -628,6 +683,18 @@ function people_view(id) {
 	showimage($("#modal_person_field_image"),persondata["picturefileid"],"small",false);
 
 	$("#modal_person_field_affiliation").text(report_getaffiliationname(persondata["affiliation"]));
+	
+	if (persondata["signedin"] == "1") {
+		$("#modal_person_signedin").text("Yes");
+	} else {
+		$("#modal_person_signedin").text("No");
+	}
+	
+	if (persondata["approval"] == "1") {
+		$("#modal_person_approval").text("Yes ("+persondata["approval_comment"]+") by "+persondata["approval_author"]);
+	} else {
+		$("#modal_person_approval").text("No/Unknown ("+persondata["approval_comment"]+") by "+persondata["approval_author"]);
+	}
 	
 	if (settings_get("useshop") != "yes") {
 		$("#modal_person_shoparea").css("display","none");
@@ -1311,6 +1378,21 @@ function affiliationgroup_add() {
 			affiliationgroup_load();
 		}
 		settings_publish()
+		$.modal.close();
+	});
+}
+
+function approval_comment_set(personid,ref) {
+	$("#modal_approvalcomment").modal();
+	var p = JSONDB.jsondb["people"][personid];
+	$("#modal_approvalcomment_comment").val(p["approval_comment"]);
+	$("#modal_approvalcomment_confirm_submit").click(function() {
+		var t = {"action":"modperson","params":{"id":personid}};
+		t["params"]["approval_comment"] = $("#modal_approvalcomment_comment").val();
+		t["params"]["approval_author"] = myemail;
+		JSONDB.dotransaction(t);
+		$(ref).parents("td").find(".approval_comment").text($("#modal_approvalcomment_comment").val());
+		$(ref).parents("td").children(".approval_author").text(myemail);
 		$.modal.close();
 	});
 }
@@ -2384,6 +2466,100 @@ function moneyin_update_total() {
 	$("#modal_moneyin_total").text(fd(temptotal));
 }
 
+function voucher_remove(voucherid) {
+	$("#modal_areyousure").modal();
+	$("#confirm_submit").click(function() {
+		var t = {"action":"removemoneyin","params":{"id":voucherid}};
+		JSONDB.dotransaction(t);
+		affiliate_vouchers_load();
+		$.modal.close();
+	});
+	return false;
+}
+
+function voucher_modal_show() {
+	$("#modal_voucher").modal();
+	
+	var selectlist = "";
+	var plist = getsortedpeople();
+	for (x in plist) {
+		var p = plist[x];
+		if (p["affiliation"] == master_affiliation_id) {
+			selectlist = selectlist + "<option value='"+p["id"]+"'>"+p["lastname"]+", "+p["firstname"]+"</option>";
+		}
+	}
+	
+	$("#modal_voucher_initalselect").append(selectlist);
+}
+
+function voucher_modify(voucherid) {
+	voucher_modal_show();
+
+	var m = JSONDB.jsondb["moneyin"][voucherid];
+	$("#modal_voucher_description").val(m["note"]);
+	$("#voucher_allocation_amount").val(m["allocation"][0]["amount"]);
+	$("#modal_voucher_initalselect").val(m["allocation"][0]["refid"]);
+
+	$("#modal_voucher_savebutton").click(function() {
+		
+		var temptotal = parseFloat($("#voucher_allocation_amount").val());
+		
+		if (temptotal == 0) {
+			alert("No amounts enterred");
+		} else {
+			var t = {"action":"modifymoneyin","params":{"id":voucherid}};
+			t["params"]["description"] = master_affiliation+" Voucher ("+$("#modal_voucher_initalselect option:selected").text()+"): "+$("#modal_voucher_description").val();
+			t["params"]["note"] = $("#modal_voucher_description").val();
+			t["params"]["affiliate_entered"] = "1";
+			t["params"]["total"] = temptotal;
+			t["params"]["isvoucher"] = "1";
+			t["params"]["voucheraffiliation"] = master_affiliation_id;
+			t["params"]["allocation"] = [];
+			var targetperson = $("#modal_voucher_initalselect").val();
+			var adata = {"type":"person","refid":targetperson,"amount":parseFloat(temptotal)};
+			t["params"]["allocation"].push(adata);
+
+			try { console.log("moneytransaction ",t); } catch (e2) {}
+			JSONDB.dotransaction(t);
+			$.modal.close();
+			affiliate_vouchers_load();
+		}
+
+	});
+}
+
+function voucher_add() {
+	if (master_affiliation_id != "") {
+		voucher_modal_show();
+		
+		$("#modal_voucher_savebutton").click(function() {
+			var temptotal = parseFloat($("#voucher_allocation_amount").val());
+			
+			if (temptotal == 0) {
+				alert("No amounts enterred");
+			} else {
+				var paymentid = JSONDB.generateid();
+				var t = {"action":"addmoneyin","params":{"id":paymentid}};
+				t["params"]["description"] = master_affiliation+" Voucher ("+$("#modal_voucher_initalselect option:selected").text()+"): "+$("#modal_voucher_description").val();
+				t["params"]["note"] = $("#modal_voucher_description").val();
+				t["params"]["affiliate_entered"] = "1";
+				t["params"]["total"] = temptotal;
+				t["params"]["isvoucher"] = "1";
+				t["params"]["voucheraffiliation"] = master_affiliation_id;
+				t["params"]["allocation"] = [];
+				var targetperson = $("#modal_voucher_initalselect").val();
+				var adata = {"type":"person","refid":targetperson,"amount":parseFloat(temptotal)};
+				t["params"]["allocation"].push(adata);
+
+				try { console.log("moneytransaction ",t); } catch (e2) {}
+				JSONDB.dotransaction(t);
+				$.modal.close();
+				affiliate_vouchers_load();
+			}
+		});
+	}
+}
+
 function moneyin_add() {
 	moneyin_show();
 	$(".allocationamount").unbind("change");
@@ -2886,6 +3062,243 @@ function report_getgroupcost(groupareaid,groupid) {
 		toreturn = parsef(JSONDB.jsondb["groupareas"][groupareaid]["groups"][groupid]["modifier"]);
 	} catch (e) {}
 	return toreturn;
+}
+
+function affiliate_vouchers_load() {
+	// Gets run early in page load but after data loaded
+	master_affiliation_id = "";
+	if (master_affiliate_mode) {
+		for (var i in JSONDB.jsondb["affiliation"]) {
+			if (JSONDB.jsondb["affiliation"][i]["groupname"] == master_affiliation) {
+				master_affiliation_id = i;
+			}
+		}
+	}
+
+	$("#affiliate_voucher_table tbody").empty();
+	var global_total_amount = 0;
+	var global_total_owing = 0;
+	
+	var vhash = {};
+	var ahash = {};
+	for (i in JSONDB.jsondb["moneyin"]) {
+		var m = JSONDB.jsondb["moneyin"][i];
+		for (x in m["allocation"]) {
+			var aitem = m["allocation"][x];
+			if (aitem["type"] == "voucher") {
+				if (!vhash.hasOwnProperty(aitem["refid"])) {
+					vhash[aitem["refid"]] = 0;
+				}
+				vhash[aitem["refid"]] = vhash[aitem["refid"]] + parsef(aitem["amount"]);
+			}
+		}
+	}
+	
+	var vcount = 0;
+	for (i in JSONDB.jsondb["moneyin"]) {
+		var m = JSONDB.jsondb["moneyin"][i];
+		//try { console.log("Voucher Checking",m); } catch (e) {}
+		if (m["isvoucher"] == "1") {
+			var a = JSONDB.jsondb["affiliation"][m["voucheraffiliation"]];
+			var balance = parsef(m["total"]) - parsef(vhash[m["id"]]);
+			if (!ahash.hasOwnProperty(m["voucheraffiliation"])) {
+				ahash[m["voucheraffiliation"]] = 0;
+			}
+			ahash[m["voucheraffiliation"]] = ahash[m["voucheraffiliation"]] + balance;
+			var alloc = "";
+			for (x in m["allocation"]) {
+				var aitem = m["allocation"][x];
+				var thistext= "";
+				if (aitem["type"] == "person") {
+					var p = JSONDB.jsondb["people"][aitem["refid"]];
+					if ((typeof p != 'undefined')) {
+						thistext = p["firstname"]+" "+p["lastname"];
+					} else {
+						thistext = "**UNKNOWN** (Deleted?)";
+					}
+				} else if (aitem["type"] == "voucher") {
+					thistext = "Voucher: "+JSONDB.jsondb["moneyin"][aitem["refid"]]["description"];
+				} else {
+					thistext = "General Income";
+				}
+				alloc = alloc + thistext + " ("+fd(parsef(aitem["amount"]))+")<br/>";
+			}
+			if (m["voucheraffiliation"] == master_affiliation_id) {
+				if (m["affiliate_entered"] == "1" && fd(parsef(m["total"])) == fd(balance)) {
+					action = "<input type='button' value='Modify' onClick='voucher_modify(\""+m["id"]+"\");'> <input type='button' value='Remove' onClick='voucher_remove(\""+m["id"]+"\");'>";
+				} else {
+					action = "&nbsp;";
+				}
+				global_total_amount = global_total_amount + parsef(m["total"]);
+				global_total_owing = global_total_owing + balance;
+				$("#affiliate_voucher_table tbody").append("<tr>\
+						<td>"+m["description"]+"</td>\
+						<td>"+alloc+"</td>\
+						<td class='alignright'>"+fd(parsef(m["total"]))+"</td>\
+						<td class='alignright'>"+fd(balance)+"</td>\
+						<td>"+action+"</td>\
+					</tr>");
+				vcount = vcount + 1;
+			}
+		}
+	}
+	$("#affiliate_voucher_table tfoot").empty();
+	$("#affiliate_voucher_table tfoot").append("<tr><td colspan='2' align='right'><b>Total:</b>&nbsp;</td><td class='alignright'>"+fd(global_total_amount)+"</td><td class='alignright'>"+fd(global_total_owing)+"</td><td>("+fd(global_total_amount - global_total_owing)+" Paid)</td></tr>");
+	
+	if (vcount > 0 && !vouchers_vsort) {
+		$("#affiliate_voucher_table tbody").trigger("update",[[[0,0]]]);
+		vouchers_vsort = true;
+	} else if (vcount > 0) {
+		$("#affiliate_voucher_table tbody").trigger("update");
+	}
+}
+
+function affiliate_finance_load() {
+	$("#affiliate_finance_table tbody").empty();
+	
+	var phash = {};
+	for (i in JSONDB.jsondb["moneyin"]) {
+		var m = JSONDB.jsondb["moneyin"][i];
+		for (x in m["allocation"]) {
+			var aitem = m["allocation"][x];
+			if (aitem["type"] == "person") {
+				if (!phash.hasOwnProperty(aitem["refid"])) {
+					phash[aitem["refid"]] = 0;
+				}
+				phash[aitem["refid"]] = phash[aitem["refid"]] + parsef(aitem["amount"]);
+			}
+	   	}
+	}	
+	
+	if (master_affiliation_id != "") {
+		var grandtotalcost = 0;
+		var grandtotalin = 0;
+		var grandtotalbalance = 0;
+		for (id in JSONDB.jsondb["people"]) {
+			var person = JSONDB.jsondb["people"][id];
+			var p = person;
+			if (person["affiliation"] == master_affiliation_id) {
+				var row = $("<tr>" +
+						"<td class='firstname'></td>" +
+						"<td class='lastname'></td>" +
+						"<td class='costbreakdown'></td>" +
+						"<td class='cost alignright'></td>" +
+						"<td class='transactions'></td>" +
+						"<td class='totalin alignright'></td>" +
+						"<td class='balance alignright'></td>" +
+						"</tr>");
+				row.children(".firstname").text(person["firstname"]);
+				row.children(".lastname").text(person["lastname"]);
+				var thiscost = 0;
+				for (x in p["groupselection"]) {
+					thiscost = thiscost + report_getgroupcost(x,p["groupselection"][x]["groupid"]);
+				}
+				try {
+					thiscost = thiscost + parsef(p["shopvouch"]);
+				} catch (e) {}
+				
+				var thispaid = parsef(phash[p["id"]]);
+			    var balance = thiscost - thispaid;
+			    grandtotalcost = grandtotalcost + thiscost;
+			    grandtotalin = grandtotalin + thispaid;
+			    grandtotalbalance = grandtotalbalance + balance;
+				
+			    var thevalue = "";
+				for (i in JSONDB.jsondb["groupareas"]["orderarray"]) {
+					var ga = JSONDB.jsondb["groupareas"][JSONDB.jsondb["groupareas"]["orderarray"][i]];
+					var selectedgroup = "Nothing Chosen";
+					//var viewhtml = "";
+					//var leaderhtml = "";
+					var thismodifier = 0.00;
+					
+					for (x in p["groupselection"]) {
+						if (x == ga["id"]) {
+							var gs = p["groupselection"][x];
+							if (ga["groups"].hasOwnProperty(gs["groupid"])) {
+								selectedgroup = ga["groups"][gs["groupid"]]["label"];
+								thismodifier = ga["groups"][gs["groupid"]]["modifier"];
+							}
+							break;
+						}
+					}
+					if (parsef(thismodifier).toFixed(2) != 0.00) {
+						thevalue = thevalue + "Cost - "+ga["label"]+": "+selectedgroup+" - "+fd(thismodifier)+"<br/>";
+					}
+				}							
+				if (settings_get("useshop") == "yes" && parsef(p["shopvouch"]).toFixed(2) != 0.00) {
+					thevalue = thevalue + "Cost - Shop Vouch - "+fd(parsef(p["shopvouch"]))+"<br/>";
+				}
+				row.children('.costbreakdown').html(thevalue);
+				row.children('.cost').text(fd(thiscost));
+				
+				thevalue = "";
+				for (i in JSONDB.jsondb["moneyin"]) {
+	              for (x in JSONDB.jsondb["moneyin"][i]["allocation"]) {
+	                var desc = JSONDB.jsondb["moneyin"][i]["description"]
+	                var alloc = JSONDB.jsondb["moneyin"][i]["allocation"][x];
+	                if (alloc["type"] == "person" && alloc["refid"] == p["id"]) {
+	                  thevalue = thevalue + "In - "+desc+" - "+fd(parsef(alloc["amount"]))+"<br/>";
+	                }
+	              }
+	            }
+				
+				row.children('.transactions').html(thevalue);
+				row.children('.totalin').text(fd(thispaid));
+				row.children('.balance').text(fd(balance));
+				
+				$("#affiliate_finance_table tbody").append(row);
+			}
+		}
+	    var footer = $("<tr>" +
+				"<td class='firstname'></td>" +
+				"<td class='lastname'></td>" +
+				"<td class='costbreakdown'></td>" +
+				"<td class='cost alignright'></td>" +
+				"<td class='transactions'></td>" +
+				"<td class='totalin alignright'></td>" +
+				"<td class='balance alignright'></td>" +
+				"</tr>");
+	    footer.children(".firstname").text("TOTAL:");
+	    footer.children(".cost").text(fd(grandtotalcost));
+	    footer.children(".totalin").text(fd(grandtotalin));
+	    footer.children(".balance").text(fd(grandtotalbalance));
+	    $("#affiliate_finance_table tfoot").empty();
+		$("#affiliate_finance_table tfoot").append(footer);
+	}
+	$("#affiliate_finance_table").trigger("update");
+}
+
+function affiliate_registrations_load() {
+	$("#affiliate_registration_table tbody").empty();
+	
+	if (master_affiliation_id != "") {
+		for (id in JSONDB.jsondb["people"]) {
+			var person = JSONDB.jsondb["people"][id];
+			if (person["affiliation"] == master_affiliation_id) {
+				var row = $("<tr>\n\
+					<td class='firstname'></td>\n\
+					<td class='lastname'></td>\n\
+					<td class='approval'></td>\n\
+					<td><span class='approval_comment'></span> (<a href='#' onClick='return affiliate_approval_comment(this);'>Add Comment</a>)</td>\n\
+					<td class='approval_author'></td>\n\
+				</tr>");
+				row.attr("personid",id);
+				row.children(".firstname").text(person["firstname"]);
+				row.children(".lastname").text(person["lastname"]);
+				row.children(".approval_author").text(person["approval_author"]);
+				row.find(".approval_comment").text(person["approval_comment"]);
+				
+				if (person["approval"] == "1") {
+					row.children(".approval").html("<span class='sivalue'>Yes</span> (<a href='#' onClick='return affiliate_switchapproval(this);'>Switch</a>)");
+				} else {
+					row.children(".approval").html("<span class='sivalue'>No</span> (<a href='#' onClick='return affiliate_switchapproval(this);'>Switch</a>)");
+				}
+				
+				$("#affiliate_registration_table tbody").append(row);
+			}
+		}
+		$("#affiliate_registration_table").trigger("update");
+	}
 }
 
 function spenders_load() {
@@ -3666,6 +4079,9 @@ function reports_load() {
 	$("#modal_createreport_left").append($("<option></option>").attr("value","c_shopamount").text("Shop Vouch Amount"));
 	$("#modal_createreport_left").append($("<option></option>").attr("value","c_cost").text("Total Cost"));
 	$("#modal_createreport_left").append($("<option></option>").attr("value","r_signedin").text("Signed-in Status"));
+	$("#modal_createreport_left").append($("<option></option>").attr("value","r_approval").text("Approval Status"));
+	$("#modal_createreport_left").append($("<option></option>").attr("value","r_approval_comment").text("Approval Comment"));
+	$("#modal_createreport_left").append($("<option></option>").attr("value","r_approval_author").text("Approval Author"));
 	$("#modal_createreport_left").append($("<option></option>").attr("value","c_regstamp").text("Registration Stamp"));
 	$("#modal_createreport_left").append($("<option></option>").attr("value","c_paid").text("Total Paid"));
 	$("#modal_createreport_left").append($("<option></option>").attr("value","c_owing").text("Total Owing"));

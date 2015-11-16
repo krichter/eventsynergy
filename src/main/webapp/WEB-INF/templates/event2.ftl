@@ -5,6 +5,9 @@
 			var master_eventid='${eventid}';
 			var master_channeltoken='${channeltoken}'; 
 			var master_clientid='${clientid}';
+			var master_affiliation='${affiliation}';
+			var master_affiliate_mode=${affiliate_mode?string('true','false')};
+			var myemail='${myemail}';
 		</script>
 		<link rel="stylesheet" type="text/css" media="screen" href="/assets/app.css"/>
 		<link rel="stylesheet" type="text/css" media="print" href="/assets/printable.css"/>
@@ -25,26 +28,34 @@
 	<body>
 		<div id="tabs" class="tabs ui-tabs ui-widget ui-widget-content ui-corner-all">
 			<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all hidewhenprinting">
-				<li class="ui-state-default ui-corner-top ui-tabs-selected ui-state-active"><a href="#tab-groups">Groups</a></li>
-				<li class="ui-state-default ui-corner-top"><a href="#tab-people">People</a></li>
-				<li class="ui-state-default ui-corner-top"><a href="#tab-affiliation">Affiliation</a></li>
-				<li class="ui-state-default ui-corner-top"><a href="#tab-registration">Registration</a></li>
-				<li class="ui-state-default ui-corner-top"><a href="#tab-settings">Settings</a></li>
-				<li class="ui-state-default ui-corner-top"><a href="#tab-points">Points</a></li>
-				<li class="ui-state-default ui-corner-top"><a href="#tab-moneyin">Money In</a></li>
-				<li class="ui-state-default ui-corner-top"><a href="#tab-vouchers">Vouchers</a></li>
-				<li class="ui-state-default ui-corner-top"><a href="#tab-peoplefinance">People Finance</a></li>
-				<li class="ui-state-default ui-corner-top"><a href="#tab-spenders">Spenders</a></li>
-				<li class="ui-state-default ui-corner-top"><a href="#tab-budget">Budget</a></li>
-				<li class="ui-state-default ui-corner-top"><a href="#tab-matrix">Matrix</a></li>
-				<li class="ui-state-default ui-corner-top"><a href="#tab-reports">Reports</a></li>
-				<li class="ui-state-default ui-corner-top"><center><input type='button' value='Exit' onClick='window.location="/manage/";'/></center></li>
+				<#if !affiliate_mode>
+					<li class="ui-state-default ui-corner-top ui-tabs-selected ui-state-active"><a href="#tab-groups">Groups</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-people">People</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-affiliation">Affiliation</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-registration">Registration</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-settings">Settings</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-points">Points</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-moneyin">Money In</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-vouchers">Vouchers</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-peoplefinance">People Finance</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-spenders">Spenders</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-budget">Budget</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-matrix">Matrix</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-reports">Reports</a></li>
+					<li class="ui-state-default ui-corner-top"><center><input type='button' value='Exit' onClick='window.location="/manage/";'/></center></li>
+				<#else>
+					<li class="ui-state-default ui-corner-top ui-tabs-selected ui-state-active"><a href="#tab-affiliate-vouchers">Vouchers</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-affiliate-registration">Registration</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tab-affiliate-finance">Finance</a></li>
+					<li class="ui-state-default ui-corner-top"><center><input type='button' value='Exit' onClick='window.location="/affiliate/";'/></center></li>
+				</#if>
 			</ul>
 			<!--//
 			------------------------------------------------------------------------------------------------------------------
 			------------------------------------------------------------------------------------------------------------------
 			------------------------------------------------------------------------------------------------------------------
 			//-->
+			<#if !affiliate_mode>
 		 	<div id="tab-groups" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
 				<p>Groups</p>
 				<input type="button" value="    Add Group Area    " onClick='groups_addgrouparea();' class='hidewhenprinting'/><input type="button" value="Refresh" onClick="groups_load();" class='hidewhenprinting'/>
@@ -132,6 +143,7 @@
 								<th class="people_datalist">Last Name</th>
 								<th class="people_datalist">Affiliation</th>
 								<th class="people_datalist">Signed-in</th>
+								<th class="people_datalist">Approved</th>
 								<th class="people_datalist  {sorter: false}" colspan='3'>Options</th>
 							</tr></thead>
 							<tbody id="people_datalist"></tbody>
@@ -564,7 +576,78 @@
 				<table id="savedreports"><thead></thead><tbody></tbody></table>
 				<br/><br/>
 				<input type="button" value="Save" onClick='reports_save();'/> <input type="button" id="modal_createreport_savebutton" value="Display" onClick='reports_run();'/>
-			</div>	
+			</div>
+			<#else>
+			<div id="tab-affiliate-vouchers" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+				<h2>Vouchers</h2>
+				<input type="button" value="    Add Voucher    " onClick='voucher_add();'/>
+				<table id="affiliate_voucher_table" class="tablesorter">
+					<thead>
+						<tr>
+							<th>Description</th>
+							<th>Allocation</th>
+							<th>Amount</th>
+							<th>Owed</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+					<tfoot></tfoot>
+				</table>
+				
+				<div style="display:none" id="modal_voucher">
+					Note: <input type="text" size="60" id="modal_voucher_description"/><br/>
+					<br/><br/>
+					Allocation:<br/>
+					<table class="model_voucher_allocationtable">
+						<tbody id="model_voucher_allocationtable">
+							<tr><td class="allocationrow">Amount: $<input type="text" size="6" id="voucher_allocation_amount" value="0.00"/> Apply to: <select id="modal_voucher_initalselect" class="allocationdirection"></select></td></tr>
+						</tbody>
+					</table>
+					<br/><br/>
+					<input type="button" id="modal_voucher_savebutton" value="Save"/> <input class='contact-cancel contact-button simplemodal-close' type='button' value='Cancel'/>
+				</div>
+			</div>
+			
+			<div id="tab-affiliate-registration" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+				<h2>Registrations for ${affiliation}</h2>
+				<table id='affiliate_registration_table' class="tablesorter">
+					<thead>
+						<tr>
+							<th>First Name</th>
+							<th>Last Name</th>
+							<th>Approved?</th>
+							<th>Approval Comment</th>
+							<th>By?</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+				
+				<div style="display:none" id="modal_approvalcomment">
+					Comment: <input type="text" size="30" id="modal_approvalcomment_comment"/><br/>
+					<input type="button" id="modal_approvalcomment_confirm_submit" value="Save"/> <input class='contact-cancel contact-button simplemodal-close' type='button' value='Cancel'/>
+				</div>
+			</div>
+			
+			<div id="tab-affiliate-finance" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+				<h2>Finance</h2>
+				<table id='affiliate_finance_table' class="tablesorter">
+					<thead>
+						<th>First Name</th>
+						<th>Last Name</th>
+						<th>Cost Breakdown</th>
+						<th>Total Cost</th>
+						<th>Transactions</th>
+						<th>Total in</th>
+						<th>Owing</th>
+					</thead>
+					<tbody></tbody>
+					<tfoot></tfoot>
+				</table>
+			</div>
+			</#if>
 		</div>
 		<div id='footer'></div>
 		<div style="display:none" id="modal_personform">
@@ -604,7 +687,8 @@
 					<td class='modal_fieldlabelcell'>Affiliation:</td><td class='modal_fieldinputcell'><select id="modal_personform_affiliation"><option value="">None</option></select></td>
 				</tr>
 				<tr>
-					<td class='modal_fieldlabelcell'>Signed in:</td><td class='modal_fieldinputcell'><input type='checkbox' id='modal_perseonform_signedin' value='1'/></td>
+					<td class='modal_fieldlabelcell'>Signed in:</td><td class='modal_fieldinputcell'><input type='checkbox' id='modal_personform_signedin' value='1'/></td>
+					<td class='modal_fieldlabelcell'>Approval:</td><td class='modal_fieldinputcell'><input type='checkbox' id='modal_personform_approval' value='1'/> Comment: <input type="text" size="15" id="modal_personform_approval_comment"/> Author: <input type="text" size="15" id="modal_personform_approval_author"/></td>
 				</tr>
 			</table>
 			Image: <div id="modal_personform_image"></div>
@@ -651,6 +735,9 @@
 			Affiliation: <span id="modal_person_field_affiliation"></span><br/>
 			Comments: <span id="modal_person_field_comments"></span><br/>
 			Amount to vouch for in the shop: <span id="modal_person_field_shopvouch"></span><br/>
+			<hr/>
+			<b>Signed in?: </b> <span id='modal_person_signedin'></span><br/>
+			<b>Approved?: </b> <span id='modal_person_approval'></span>
 			<hr/>
 			<div style="position:relative;">
 				<div style="float:left;width:50%;">
