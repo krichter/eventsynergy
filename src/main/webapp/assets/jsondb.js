@@ -1,7 +1,7 @@
 (function() {
 
 // Settings
-var catchuppolltime = 60000;
+var catchuppolltime = 5000;
 
 // Leave this alone
 var tlisteners = {};
@@ -16,11 +16,10 @@ var channeltoken = "";
 var clientid = "";
 
 window.JSONDB = {
-	init: function(contfunc,setdbid,setchanneltoken,setclientid) {
+	init: function(contfunc,setdbid,setclientid) {
 		//loadjscssfile("/jsondb/dbutils", "js");
 		//loadjscssfile("/jsondb/transactions", "js");
 		dbid = setdbid;
-		channeltoken = setchanneltoken;
 		clientid = setclientid;
 		jsondbinit(contfunc)
 	},
@@ -431,7 +430,7 @@ function jsondbinit(continueinit) {
 		}
 		//setTimeout("catchup()",catchuppolltime);
 		//setTimeout("JSONDB.internal_catchup()",catchuppolltime);
-		startlisten();
+		//startlisten();
 		continueinit();
 	}
 	function jsondbinit_op1() {

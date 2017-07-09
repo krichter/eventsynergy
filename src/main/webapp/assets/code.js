@@ -10,7 +10,7 @@ jQuery(document).ready(function() {
 			});
 		}
 		
-		JSONDB.init(c,master_eventid,master_channeltoken,master_clientid);
+		JSONDB.init(c,master_eventid,master_clientid);
 
 		$("#people_datalist_master").tablesorter({
 			headers: {

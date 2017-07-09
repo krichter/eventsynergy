@@ -3,7 +3,6 @@
 		<title>Event Manager for ${eventid}</title>
 		<script type="text/javascript">
 			var master_eventid='${eventid}';
-			var master_channeltoken='${channeltoken}'; 
 			var master_clientid='${clientid}';
 			var master_affiliation='${affiliation}';
 			var master_affiliate_mode=${affiliate_mode?string('true','false')};
@@ -17,7 +16,6 @@
 		<script src="/assets/jquery-ui-1.8.18.custom.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/assets/jquery.ui.touch-punch.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/assets/jquery.simplemodal.1.4.1.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="/_ah/channel/jsapi"></script>
 		<script src="/assets/jsondb.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/jsondb/dbutils" type="text/javascript" charset="utf-8"></script>
 		<script src="/jsondb/transactions" type="text/javascript" charset="utf-8"></script>

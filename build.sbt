@@ -1,6 +1,6 @@
 name := "eventsynergy"
 
-version := "8"
+version := "9"
 
 scalaVersion := "2.10.4"
 

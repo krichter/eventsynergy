@@ -19,7 +19,6 @@ import scala.language.implicitConversions;
 import freemarker.template._;
 
 import com.google.appengine.api.users.{UserService,UserServiceFactory}
-import com.google.appengine.api.channel.{ChannelServiceFactory,ChannelMessage}
 import com.google.appengine.api.datastore.{DatastoreService,DatastoreServiceFactory,Entity,Query,PreparedQuery,Key,KeyFactory,FetchOptions,Transaction,TransactionOptions}
 import com.google.appengine.api.datastore.FetchOptions.Builder._
 import com.google.appengine.api.memcache.{MemcacheServiceFactory,MemcacheService,Expiration}
@@ -40,7 +39,6 @@ class CSScalatraServlet extends ScalatraServlet with FileUploadSupport {
 	var datastore = DatastoreServiceFactory.getDatastoreService();
 	var memcacheservice = MemcacheServiceFactory.getMemcacheService();
 	
-	//var channelService = ChannelServiceFactory.getChannelService();
 	//var blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 	//implicit def textToString(input: com.google.appengine.api.datastore.Text): String = input.getValue();
 	implicit def object2PropertyValue(o: Object):PropertyValue = new PropertyValue(o);

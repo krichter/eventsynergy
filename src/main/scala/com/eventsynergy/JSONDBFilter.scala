@@ -20,7 +20,6 @@ import scala.language.implicitConversions
 import freemarker.template._;
 
 import com.google.appengine.api.users.{UserService,UserServiceFactory}
-import com.google.appengine.api.channel.{ChannelServiceFactory,ChannelMessage}
 import com.google.appengine.api.datastore.{DatastoreService,DatastoreServiceFactory,Entity,Query,PreparedQuery,Key,KeyFactory,FetchOptions,Transaction,TransactionOptions}
 import com.google.appengine.api.datastore.FetchOptions.Builder._
 import com.google.appengine.api.memcache.{MemcacheServiceFactory,MemcacheService,Expiration}
@@ -38,7 +37,6 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 	val userService = UserServiceFactory.getUserService();
 	//var datastore = DatastoreServiceFactory.getDatastoreService();
 	val memcacheservice = MemcacheServiceFactory.getMemcacheService();
-	val channelService = ChannelServiceFactory.getChannelService();
 	implicit def object2PropertyValue(o: Object):PropertyValue = new PropertyValue(o);
 	implicit def entity2CustomEntity(e: Entity):CustomEntity = new CustomEntity(e);
 	case class Event(id:String,title:String);
@@ -193,11 +191,8 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 					Utils.releaseLock(eventid+"_channelreg")
 				}
 				
-				var channeltoken = channelService.createChannel(clientid);
-
 				// Freemarker template processing
 				var m = new java.util.HashMap[String,Any]();
-				m.put("channeltoken",channeltoken);
 				m.put("eventid",eventid);
 				m.put("clientid",clientid);
 				m.put("affiliate_mode",false);
@@ -388,9 +383,9 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 			Utils.releaseLock(eventid+"_channelreg")
 		}
 		
-		var channeltoken = channelService.createChannel(clientid);
+		//var channeltoken = channelService.createChannel(clientid);
 		
-		"{\"success\":true,\"channeltoken\":\""+channeltoken+"\",\"clientid\":\""+clientid+"\"}"
+		"{\"success\":true,\"channeltoken\":\"\",\"clientid\":\""+clientid+"\"}"
 	}
 	
 	get("/manage/tlist") {
@@ -556,11 +551,11 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 					Utils.releaseLock(eventid+"_channelreg")
 				}
 				
-				var channeltoken = channelService.createChannel(clientid);
+				//var channeltoken = channelService.createChannel(clientid);
 
 				// Freemarker template processing
 				var m = new java.util.HashMap[String,Any]();
-				m.put("channeltoken",channeltoken);
+				//m.put("channeltoken",channeltoken);
 				m.put("eventid",eventid);
 				m.put("affiliation",Utils.affiliateallowed(userService.getCurrentUser().getEmail().toLowerCase()))
 				m.put("affiliate_mode",true);
@@ -951,7 +946,7 @@ class JSONDBFilter extends ScalatraFilter with FileUploadSupport {
 				if (isthere != null) {
 					if (cid != excludeclient) {
 						//println("Sending message to "+cid+": "+message)
-						channelService.sendMessage(new ChannelMessage(cid, message));	
+						//channelService.sendMessage(new ChannelMessage(cid, message));
 					}
 					newlist += cid;
 				} else {

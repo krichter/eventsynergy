@@ -24,7 +24,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils
 //import freemarker.template._;
 
 import com.google.appengine.api.users.{UserService,UserServiceFactory}
-import com.google.appengine.api.channel.{ChannelServiceFactory,ChannelMessage}
 import com.google.appengine.api.datastore.{DatastoreService,DatastoreServiceFactory,Entity,Query,PreparedQuery,Key,KeyFactory,FetchOptions,Transaction,TransactionOptions}
 import com.google.appengine.api.datastore.FetchOptions.Builder._
 import com.google.appengine.api.memcache.{MemcacheServiceFactory,MemcacheService,Expiration}
@@ -39,7 +38,6 @@ object Utils {
 	var userService = UserServiceFactory.getUserService();
 	//var datastore = DatastoreServiceFactory.getDatastoreService();
 	var memcacheservice = MemcacheServiceFactory.getMemcacheService();
-	var channelService = ChannelServiceFactory.getChannelService();
 	implicit def object2PropertyValue(o: Object):PropertyValue = new PropertyValue(o);
 	implicit def entity2CustomEntity(e: Entity):CustomEntity = new CustomEntity(e);
 	val startval:Long = 1000;
