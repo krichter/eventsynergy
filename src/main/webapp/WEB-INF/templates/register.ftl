@@ -164,7 +164,7 @@
 		<br/>
 		Emergency Contact Information (Name(s), Relation(s), and phone #):<br/>
 		<input type='text' size='60' name='emergencyinfo' manditory_label='Emergency Contact Info' <#if settings.public_fieldmanditory_emergencyinfo.isDefined() && settings.public_fieldmanditory_emergencyinfo.get() == "yes"> class='manditoryfield'</#if>/> <#if settings.public_fieldmanditory_emergencyinfo.isDefined() && settings.public_fieldmanditory_emergencyinfo.get() == "yes"><span class='manditorytag'>*</span></#if><br/>
-		BC Care Card #: <input type='text' size='15' name='carecard' manditory_label='BC Care Card' <#if settings.public_fieldmanditory_carecard.isDefined() && settings.public_fieldmanditory_carecard.get() == "yes"> class='manditoryfield'</#if>/> <#if settings.public_fieldmanditory_carecard.isDefined() && settings.public_fieldmanditory_carecard.get() == "yes"><span class='manditorytag'>*</span></#if><br/>
+		Provincial Health #: <input type='text' size='15' name='carecard' manditory_label='BC Care Card' <#if settings.public_fieldmanditory_carecard.isDefined() && settings.public_fieldmanditory_carecard.get() == "yes"> class='manditoryfield'</#if>/> <#if settings.public_fieldmanditory_carecard.isDefined() && settings.public_fieldmanditory_carecard.get() == "yes"><span class='manditorytag'>*</span></#if><br/>
 		<br/>
 		Youth Group Affiliation: <select name='affiliation' manditory_label='Youth Group Affiliation' <#if settings.public_fieldmanditory_affiliation.isDefined() && settings.public_fieldmanditory_affiliation.get() == "yes"> class='manditoryfield'</#if>>
 			<option value=''>Please Select...</option>
